@@ -139,3 +139,38 @@ flowchart TB
 | `.github` | CI de verificación y actualizaciones con Dependabot. |
 
 Más detalle en [docs/architecture.md](docs/architecture.md).
+
+## 🚀 Arranque rápido
+
+Requiere la versión de Node.js de [`.node-version`](.node-version) y npm con el lockfile del repositorio.
+
+```sh
+npm ci --ignore-scripts
+npm run dev
+```
+
+Abre `http://localhost:3000`. El catálogo en JSON está en `/api/catalogo` y `/api/health` comprueba el arranque.
+
+### 📱 Probar la PWA
+
+```sh
+npm run build
+npm start
+```
+
+Desde HTTPS, usa **Instalar app** o la opción de instalar del navegador. Después de la primera carga en línea, la portada y el catálogo semilla se consultan sin conexión.
+
+## ✅ Verificaciones
+
+| Comando | Qué comprueba |
+| --- | --- |
+| `npm run check` | Lint, tipos y compilación de producción. |
+| `npm audit --audit-level=low` | Vulnerabilidades conocidas en las dependencias. |
+| `npm run smoke` | Con la app en marcha: portada, `/api/health`, `/api/catalogo` con fuentes `https`, manifiesto PWA y *service worker*. Usa `QURI_SMOKE_URL` para otra dirección. |
+
+```mermaid
+flowchart LR
+    A["📥 push o PR"] --> B["npm ci"] --> C["🧹 lint"] --> D["🔤 tipos"] --> E["🏗️ build"] --> F["🛡️ npm audit"] --> G["✅ Verificación"]
+```
+
+El CI corre en cada *pull request* y en cada cambio a `main`.
