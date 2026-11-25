@@ -1,4 +1,4 @@
-# Arquitectura de Curinawi
+# Arquitectura de Quri-Ñawi
 
 La primera versión usa el App Router de Next.js con TypeScript y npm. La portada contiene una experiencia de una sola página, con secciones enlazables.
 
@@ -25,6 +25,6 @@ La primera versión usa el App Router de Next.js con TypeScript y npm. La portad
 
 ## Créditos de imagen
 
-- Logo de Curinawi generado con ImageGen. El encargo fue un ojo de tinta verde con iris ocre dividido por un río en negativo. Los iconos instalables reutilizan ese mismo símbolo.
+- Logo de Quri-Ñawi generado con ImageGen. El encargo fue un ojo de tinta verde con iris ocre dividido por un río en negativo. Los iconos instalables reutilizan ese mismo símbolo.
 - La imagen aérea es una ilustración generada con ImageGen para el informe del proyecto y reutilizada aquí.
-- El [logo oficial de Gold for Good](https://gold4good.info.bo/site/assets/logo.svg) se obtuvo del pie de su sitio y aparece en el pie de Curinawi como crédito a la hackathon.
+- El [logo oficial de Gold for Good](https://gold4good.info.bo/site/assets/logo.svg) se obtuvo del pie de su sitio y aparece en el pie de Quri-Ñawi como crédito a la hackathon.

@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="public/brand/curinawi.png" alt="Logo de Curinawi: un ojo verde con iris ocre atravesado por un río" width="150">
+  <img src="public/brand/quri-nawi.png" alt="Logo de Quri-Ñawi: un ojo verde con iris ocre atravesado por un río" width="150">
 </p>
 
-<h1 align="center">Curinawi</h1>
+<h1 align="center">Quri-Ñawi</h1>
 
 <p align="center">
   <b>Atlas de evidencia sobre mercurio · Cuenca del Beni, Bolivia</b><br>
@@ -20,11 +20,11 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/portada.jpg" alt="Portada de Curinawi con el título «Lo que sabemos del río» y una ilustración aérea de la cuenca del Beni" width="100%">
+  <img src="docs/assets/portada.jpg" alt="Portada de Quri-Ñawi con el título «Lo que sabemos del río» y una ilustración aérea de la cuenca del Beni" width="100%">
 </p>
 
 > [!NOTE]
-> Curinawi es la aplicación del equipo **Golden Eye** para **Gold for Good · ORO-3.3**, «Mapa vivo de estudios y proyectos sobre mercurio». El piloto se centra en la cuenca del Beni y la primera consulta se plantea en el río Kaka.
+> Quri-Ñawi es la aplicación del equipo **GoldnEye** para **Gold for Good · ORO-3.3**, «Mapa vivo de estudios y proyectos sobre mercurio». El piloto se centra en la cuenca del Beni y la primera consulta se plantea en el río Kaka.
 
 <p align="center">
   <a href="#-avance-al-25-de-noviembre">Avance</a> ·
@@ -74,7 +74,7 @@ La aplicación ya cubre el recorrido de consulta: explorar la cuenca, abrir la f
     </td>
   </tr>
   <tr>
-    <td align="center"><img src="docs/assets/celular.jpg" alt="Curinawi en un celular" width="300"></td>
+    <td align="center"><img src="docs/assets/celular.jpg" alt="Quri-Ñawi en un celular" width="300"></td>
     <td>
       <h3>📱 Llevarla en el celular</h3>
       La interfaz se adapta a pantallas pequeñas y se instala como app desde <b>Instalar app</b>.
@@ -223,11 +223,11 @@ Trabaja en una rama desde `main`, limita el cambio a una sección y abre una sol
 
 - 🎬 [Demo conceptual de Ale](https://qurinawi.vercel.app/), referencia visual y del servidor MCP.
 - 🏆 [Gold for Good Hackathon](https://gold4good.info.bo/site/). Su logo aparece en el pie de la app como crédito a la hackathon.
-- 🎨 El logo de Curinawi y la ilustración aérea de la cuenca se generaron con ImageGen. Los detalles están en [docs/architecture.md](docs/architecture.md#créditos-de-imagen).
+- 🎨 El logo de Quri-Ñawi y la ilustración aérea de la cuenca se generaron con ImageGen. Los detalles están en [docs/architecture.md](docs/architecture.md#créditos-de-imagen).
 - 🔤 Tipografías Inter y Space Grotesk, con licencia SIL Open Font License 1.1.
 
 ---
 
 <p align="center">
-  <sub>Hecho con 💛 por el equipo <b>Golden Eye</b> · Gold for Good · Oro Responsable Bolivia 2026</sub>
+  <sub>Hecho con 💛 por el equipo <b>GoldnEye</b> · Gold for Good · Oro Responsable Bolivia 2026</sub>
 </p>
