@@ -5,11 +5,15 @@ La primera versión usa el App Router de Next.js con TypeScript y npm. La portad
 | Lugar | Responsabilidad |
 | --- | --- |
 | `src/app` | Rutas, interfaz y respuestas HTTP. |
+| `src/app/api/catalogo` | Catálogo público en JSON para personas y agentes. |
+| `src/app/api/health` | Estado del servidor, sin caché. |
+| `src/app/manifest.ts` | Manifiesto de la PWA: nombre, colores e íconos instalables. |
 | `src/lib/project.ts` | Identidad y datos públicos del proyecto. |
 | `src/lib/catalog.ts` | Catálogo semilla. La interfaz y la API usan los mismos registros públicos. |
 | `src/components` | Atlas esquemático, comparación, borradores locales, guía, instalación y secciones. |
 | `public/sw.js` | Caché de la vista principal y de sus recursos públicos. |
-| `scripts/smoke.mjs` | Verificación de la portada y del estado de la app en ejecución. |
+| `scripts/smoke.mjs` | Prueba HTTP de la portada, el estado, el catálogo, el manifiesto y el *service worker*. |
+| `docs/assets` | Capturas de la aplicación usadas en el README. |
 
 ## Decisiones para la siguiente etapa
 
