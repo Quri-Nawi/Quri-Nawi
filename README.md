@@ -44,3 +44,46 @@ La aplicación ya cubre el recorrido de consulta: explorar la cuenca, abrir la f
 | 🧪 **Calidad** | ✅ | CI con lint, tipos, compilación y `npm audit`; prueba HTTP de portada, API y PWA. | Pruebas en navegador. |
 
 <sub>✅ listo · 🟡 en curso · ⏳ pendiente</sub>
+
+## ✨ Qué puedes hacer hoy
+
+<table>
+  <tr>
+    <td width="62%"><img src="docs/assets/atlas.jpg" alt="Atlas de la cuenca del Beni con los ríos Kaka, Beni y Madre de Dios y la lista filtrable de fichas"></td>
+    <td>
+      <h3>🗺️ Explorar la cuenca</h3>
+      Selecciona un río en el atlas o filtra por territorio y tipo de muestra. Cada ficha abre su nota, la fecha de muestreo y el enlace a la fuente.
+      <br><br>
+      Alterna entre <b>Mapa</b> y <b>Relieve 3D</b>. La geometría es esquemática y las ubicaciones, aproximadas.
+    </td>
+  </tr>
+  <tr>
+    <td><img src="docs/assets/comparar.jpg" alt="Comparación de dos observaciones de sedimentos del Kaka: 0,088 y 0,214 µg/g"></td>
+    <td>
+      <h3>⚖️ Comparar dos registros</h3>
+      Pon dos fichas lado a lado. En el caso del Kaka, la app recuerda que ambas observaciones son de 1998, vienen de la misma revisión y les falta el método y el punto exacto.
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/assets/celular.jpg" alt="Curinawi en un celular" width="300"></td>
+    <td>
+      <h3>📱 Llevarla en el celular</h3>
+      La interfaz se adapta a pantallas pequeñas y se instala como app desde <b>Instalar app</b>.
+      <br><br>
+      <h3>🧭 Recorrido con Quri</h3>
+      Una guía de tres pasos lleva de la exploración a la comparación y al aporte.
+      <br><br>
+      <h3>✍️ Proponer un estudio</h3>
+      Guarda el título, el DOI o enlace y el territorio como borrador para revisión.
+    </td>
+  </tr>
+</table>
+
+```mermaid
+flowchart LR
+    A["🗺️ Explorar el atlas"] --> B["🔎 Filtrar por territorio<br>o tipo de muestra"]
+    B --> C["📄 Ver ficha y abrir fuente"]
+    C --> D["⚖️ Comparar dos fichas"]
+    D --> E["✍️ Proponer un estudio"]
+    E --> F[("💾 Borrador local<br>pendiente de revisión")]
+```
