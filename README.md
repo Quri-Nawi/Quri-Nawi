@@ -26,6 +26,15 @@
 > [!NOTE]
 > Curinawi es la aplicación del equipo **Golden Eye** para **Gold for Good · ORO-3.3**, «Mapa vivo de estudios y proyectos sobre mercurio». El piloto se centra en la cuenca del Beni y la primera consulta se plantea en el río Kaka.
 
+<p align="center">
+  <a href="#-avance-al-25-de-noviembre">Avance</a> ·
+  <a href="#-qué-puedes-hacer-hoy">Funciones</a> ·
+  <a href="#-catálogo-semilla">Catálogo</a> ·
+  <a href="#-arquitectura">Arquitectura</a> ·
+  <a href="#-arranque-rápido">Arranque</a> ·
+  <a href="#-hoja-de-ruta">Hoja de ruta</a>
+</p>
+
 ## 📈 Avance al 25 de noviembre
 
 La aplicación ya cubre el recorrido de consulta: explorar la cuenca, abrir la fuente, comparar dos fichas y proponer un estudio. La revisión humana, los permisos y la prueba con usuarios son el siguiente tramo.
@@ -174,3 +183,51 @@ flowchart LR
 ```
 
 El CI corre en cada *pull request* y en cada cambio a `main`.
+
+## 🧭 Hoja de ruta
+
+| Orden | Bloque | Siguiente entrega |
+| :---: | --- | --- |
+| 1 | 📖 **Fichas revisadas** | Validar las fichas semilla con revisores, con página o tabla de respaldo. |
+| 2 | ⚖️ **Comparar evidencia** | Comparar con matriz, analito, unidad, método, época y precisión del sitio. |
+| 3 | ✍️ **Revisar y publicar** | Revisión humana, permisos, persistencia e historial. |
+| 4 | 👥 **Validar con usuarios** | Prueba cronometrada: encontrar la fuente y explicar qué dato falta. |
+| 5 | 🤖 **Agentes** | Conectar el MCP de referencia a la misma vista pública. |
+
+```mermaid
+gantt
+    title Cierre de la hackathon · noviembre de 2026
+    dateFormat YYYY-MM-DD
+    axisFormat %d nov
+    section Producto
+    Integración y validación : 2026-11-25, 1d
+    Ensayo del pitch         : 2026-11-26, 1d
+    section Entregas
+    Entrega del deck         : milestone, 2026-11-26, 0d
+    Evaluación técnica       : 2026-11-27, 1d
+    Final ante autoridades   : 2026-11-28, 1d
+```
+
+## 🔐 Datos y seguridad
+
+- 🏷️ Solo se publican registros públicos. Los borradores se quedan en el navegador de quien los crea.
+- 🩺 Los datos de salud se muestran agregados, sin datos individuales ni ubicaciones precisas.
+- 📄 Los estudios de terceros se enlazan; no se redistribuyen sus PDF.
+- 🔑 Las credenciales se configuran fuera del código. Ver [SECURITY.md](SECURITY.md).
+
+## 🤝 Contribuir
+
+Trabaja en una rama desde `main`, limita el cambio a una sección y abre una solicitud de cambios con el resultado de `npm run check`. Guía completa en [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## 🔗 Enlaces y créditos
+
+- 🎬 [Demo conceptual de Ale](https://qurinawi.vercel.app/), referencia visual y del servidor MCP.
+- 🏆 [Gold for Good Hackathon](https://gold4good.info.bo/site/). Su logo aparece en el pie de la app como crédito a la hackathon.
+- 🎨 El logo de Curinawi y la ilustración aérea de la cuenca se generaron con ImageGen. Los detalles están en [docs/architecture.md](docs/architecture.md#créditos-de-imagen).
+- 🔤 Tipografías Inter y Space Grotesk, con licencia SIL Open Font License 1.1.
+
+---
+
+<p align="center">
+  <sub>Hecho con 💛 por el equipo <b>Golden Eye</b> · Gold for Good · Oro Responsable Bolivia 2026</sub>
+</p>
