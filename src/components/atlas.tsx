@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { areas, matrices, records, type Area } from "../lib/catalog";
 import { Comparison } from "./comparison";
 import { Terrain } from "./terrain";
@@ -19,6 +19,15 @@ export function Atlas() {
     (!area || record.area === area) && (!matrix || record.matrix === matrix)
     && normalize([record.title, record.area, record.source, record.sample].join(" ")).includes(normalize(search)),
   );
+  useEffect(() => {
+    // La portada 3D pide mostrar en la lista el río que se está viendo.
+    const show = (event: Event) => {
+      const detail = (event as CustomEvent<unknown>).detail;
+      if (areas.includes(detail as Area)) { setArea(detail as Area); setMatrix(""); setSearch(""); }
+    };
+    window.addEventListener("quri:area", show);
+    return () => window.removeEventListener("quri:area", show);
+  }, []);
   const selected = chosen.flatMap((id) => records.filter((item) => item.id === id));
 
   function select(id: string) {

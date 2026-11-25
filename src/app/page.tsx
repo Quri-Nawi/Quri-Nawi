@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Atlas } from "../components/atlas";
+import { BasinHero } from "../components/basin-hero";
 import { Contribution } from "../components/contribution";
 import { Guide } from "../components/guide";
 import { InstallApp } from "../components/install-app";
@@ -10,7 +11,7 @@ export default function HomePage() {
   return (
     <>
       <a className="skip-link" href="#contenido">Ir al contenido</a>
-      <header className="site-header" id="inicio">
+      <header className="site-header over-map" id="inicio">
         <div className="header-inner">
           <a className="brand" href="#inicio" aria-label={project.name + ", inicio"}>
             <Image src="/brand/quri-nawi.png" alt="" width={48} height={39} unoptimized />
@@ -23,18 +24,8 @@ export default function HomePage() {
         </div>
       </header>
       <main id="contenido" tabIndex={-1}>
-        <section className="section-inner hero" aria-labelledby="hero-title">
-          <div className="hero-copy">
-            <p className="eyebrow">Atlas de evidencia · Bolivia</p>
-            <h1 id="hero-title">Lo que sabemos<br /><em>del río.</em></h1>
-            <p className="intro">Explora estudios y proyectos sobre mercurio. Encuentra la fuente de cada hallazgo y decide qué falta investigar.</p>
-            <div className="hero-actions"><a className="button primary" href="#explorar">Explorar el atlas <span aria-hidden="true">↗</span></a><Guide /></div>
-          </div>
-          <figure className="hero-visual">
-            <Image src="/images/cuenca-del-beni.jpg" alt="Ilustración aérea de un río entre laderas boscosas de la Amazonía boliviana" width={1500} height={1000} unoptimized preload />
-            <figcaption><span><i /> Territorio piloto</span><strong>Cuenca del Beni</strong><small>Paisaje ilustrativo</small></figcaption>
-          </figure>
-        </section>
+        <BasinHero />
+        <div className="section-inner guide-strip"><p>¿Primera vez? Sigue el recorrido de tres pasos.</p><Guide /></div>
         <Atlas />
         <ProjectSections />
         <Contribution />

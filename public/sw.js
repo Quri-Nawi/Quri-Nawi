@@ -1,12 +1,14 @@
 /* global self, caches, fetch, URL, Response */
-const CACHE = "quri-nawi-public-v1";
+const CACHE = "quri-nawi-public-v2";
 const shellFiles = [
   "/manifest.webmanifest",
   "/brand/quri-nawi.png",
   "/brand/app-192.png",
   "/brand/app-512.png",
   "/brand/gold-for-good.svg",
-  "/images/cuenca-del-beni.jpg",
+  "/geo/rios.json",
+  "/geo/relieve.bin",
+  "/geo/satelite.jpg",
   "/fonts/inter.woff2",
   "/fonts/space-grotesk.woff2",
 ];
