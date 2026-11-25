@@ -87,3 +87,28 @@ flowchart LR
     D --> E["✍️ Proponer un estudio"]
     E --> F[("💾 Borrador local<br>pendiente de revisión")]
 ```
+
+## 📚 Catálogo semilla
+
+Las fichas viven en [`src/lib/catalog.ts`](src/lib/catalog.ts). La interfaz y la API leen los mismos registros. Están pendientes de revisión.
+
+| Ficha | Territorio | Tipo | Muestreo | Publicación | Fuente |
+| --- | --- | --- | --- | --- | --- |
+| Mercurio en sedimentos · época seca | Kaka | Sedimentos | 1998 | 2025 | [Revisión de la cuenca del Beni](https://www.scielo.org.bo/scielo.php?lng=en&nrm=iso&pid=S0250-54602025000200097&script=sci_arttext&tlng=en) |
+| Mercurio en sedimentos · época húmeda | Kaka | Sedimentos | 1998 | 2025 | [Revisión de la cuenca del Beni](https://www.scielo.org.bo/scielo.php?lng=en&nrm=iso&pid=S0250-54602025000200097&script=sci_arttext&tlng=en) |
+| Elementos traza en peces comestibles del Beni | Beni | Peces | Jul–ago 2015 | 2022 | [Rodriguez-Levy et al. · Heliyon](https://pubmed.ncbi.nlm.nih.gov/36444265/) |
+| Composición nutricional y mercurio en peces del Beni | Beni | Peces | Consultar el artículo | 2025 (DOI) | [Reseña UMSA](https://dipgis.umsa.bo/?p=7902) |
+| Mercurio y salud en la Amazonía boliviana | Madre de Dios | Datos agregados | 2023–2024 | 2026 | [SELADIS y CEDIB](https://www.cedib.org/biblioteca/mercurio-y-salud-en-la-amazonia-boliviana-roger-carvajal/) |
+| Programa planetGOLD Bolivia | Beni | Proyecto | Alcance nacional | Programa vigente | [planetGOLD Bolivia](https://www.planetgold.org/es/bolivia) |
+
+```mermaid
+pie showData
+    title Fichas semilla por tipo de registro
+    "Sedimentos" : 2
+    "Peces" : 2
+    "Datos agregados" : 1
+    "Proyecto" : 1
+```
+
+> [!IMPORTANT]
+> Las dos fichas del Kaka remiten a la misma revisión. Los peces se compraron en mercados de Riberalta y Rurrenabaque, así que la ficha no confirma el punto de captura. La ficha de salud enlaza el informe y omite datos individuales y ubicaciones precisas.
