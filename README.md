@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/portada.jpg" alt="Portada de Quri-Ñawi con el título «Lo que sabemos del río» y una ilustración aérea de la cuenca del Beni" width="100%">
+  <img src="docs/assets/portada.jpg" alt="Portada de Quri-Ñawi: maqueta 3D de la cuenca del Beni con relieve real, ríos con fichas en dorado y el título «Explora un río. Comprueba qué se sabe del mercurio»" width="100%">
 </p>
 
 > [!NOTE]
@@ -41,7 +41,7 @@ La aplicación ya cubre el recorrido de consulta: explorar la cuenca, abrir la f
 
 | Bloque del plan | Estado | Qué funciona hoy | Qué falta |
 | --- | :---: | --- | --- |
-| 🗺️ **Catálogo y mapa** | ✅ | Atlas esquemático con vista de mapa y relieve 3D, búsqueda y filtros por territorio y tipo de muestra. | Filtro por especie cuando aplique. |
+| 🗺️ **Catálogo y mapa** | ✅ | Portada 3D con relieve real que gira sola; clic en un río para acercarse y ver sus fichas. Vista 2D, búsqueda y filtros por territorio y tipo de muestra. | Filtro por especie cuando aplique. |
 | 📖 **Fichas** | 🟡 | 6 fichas semilla con fuente enlazada y fechas de muestreo y publicación separadas. | Revisarlas y llegar a 5 estudios revisados con página o tabla de respaldo. |
 | ⚖️ **Comparar evidencia** | 🟡 | Dos fichas lado a lado, con una nota que explica los límites de la comparación. | Analito, método y unidad como campos; señal de posibles duplicados. |
 | ✍️ **Aportes** | 🟡 | Borradores en el navegador, con validación de DOI o enlace `https://` y control de repetidos. | Envío a revisión y persistencia en servidor. |
@@ -58,9 +58,20 @@ La aplicación ya cubre el recorrido de consulta: explorar la cuenca, abrir la f
 
 <table>
   <tr>
-    <td width="62%"><img src="docs/assets/atlas.jpg" alt="Atlas de la cuenca del Beni con los ríos Kaka, Beni y Madre de Dios y la lista filtrable de fichas"></td>
+    <td width="62%"><img src="docs/assets/rio-kaka.jpg" alt="Zoom al río Kaka en la maqueta 3D, con dos etiquetas de sedimentos (0,088 y 0,214 µg/g) unidas por líneas al tramo del río"></td>
     <td>
-      <h3>🗺️ Explorar la cuenca</h3>
+      <h3>🏔️ Recorrer la cuenca en 3D</h3>
+      La portada es una maqueta de la cuenca del Beni con <b>relieve real</b>, imagen satelital y los ríos de OpenStreetMap. Gira sola; los ríos con fichas brillan en dorado.
+      <br><br>
+      Haz clic en un río y la cámara se acerca. A cada lado aparecen sus estudios: tipo de muestra, valor y unidad, fecha de muestreo y de publicación, precisión del lugar, estado de revisión y fuente. El panel indica qué falta en el catálogo para ese río.
+      <br><br>
+      Comparte un río con un enlace como <code>/?rio=Kaka</code>.
+    </td>
+  </tr>
+  <tr>
+    <td><img src="docs/assets/atlas.jpg" alt="Atlas de la cuenca del Beni con los ríos Kaka, Beni y Madre de Dios y la lista filtrable de fichas"></td>
+    <td>
+      <h3>🗺️ Vista 2D y lista</h3>
       Selecciona un río en el atlas o filtra por territorio y tipo de muestra. Cada ficha abre su nota, la fecha de muestreo y el enlace a la fuente.
       <br><br>
       Alterna entre <b>Mapa</b> y <b>Relieve 3D</b>. La geometría es esquemática y las ubicaciones, aproximadas.
@@ -90,6 +101,8 @@ La aplicación ya cubre el recorrido de consulta: explorar la cuenca, abrir la f
 
 ```mermaid
 flowchart LR
+    Z["🏔️ Clic en un río<br>de la maqueta 3D"] --> Y["🏷️ Etiquetas de sus estudios"]
+    Y --> C
     A["🗺️ Explorar el atlas"] --> B["🔎 Filtrar por territorio<br>o tipo de muestra"]
     B --> C["📄 Ver ficha y abrir fuente"]
     C --> D["⚖️ Comparar dos fichas"]
@@ -128,6 +141,9 @@ pie showData
 flowchart TB
     C[("📚 src/lib/catalog.ts<br>catálogo semilla")]
     C --> P["🖥️ Portada<br>src/app/page.tsx"]
+    G[("🌎 public/geo<br>relieve · satélite · ríos")] --> M["🏔️ Maqueta 3D<br>basin-hero.tsx · basin-scene.ts"]
+    P --> M
+    C --> M
     C --> J["🔗 /api/catalogo<br>JSON público"]
     P --> A["🗺️ Atlas y relieve<br>atlas.tsx · terrain.tsx"]
     P --> K["⚖️ Comparación<br>comparison.tsx"]
@@ -141,9 +157,10 @@ flowchart TB
 | Lugar | Responsabilidad |
 | --- | --- |
 | `src/app` | Portada, estilos, manifiesto PWA y rutas HTTP (`/api/catalogo`, `/api/health`). |
-| `src/components` | Atlas, relieve, comparación, aportes, guía Quri, instalación y secciones de método, impacto, agentes y escala. |
+| `src/components` | Maqueta 3D (Three.js), atlas 2D, relieve, comparación, aportes, guía Quri, instalación y secciones de método, impacto, agentes y escala. |
 | `src/lib` | Identidad del proyecto y catálogo semilla. |
-| `public` | Logo, íconos, ilustración de la cuenca, tipografías y *service worker*. |
+| `public` | Logo, íconos, tipografías, *service worker* y datos de la cuenca en `public/geo`. |
+| `scripts/geodatos.py` | Regenera relieve, imagen satelital y ríos de `public/geo` desde fuentes públicas. |
 | `scripts/smoke.mjs` | Prueba HTTP de la app en ejecución. |
 | `.github` | CI de verificación y actualizaciones con Dependabot. |
 
@@ -223,7 +240,8 @@ Trabaja en una rama desde `main`, limita el cambio a una sección y abre una sol
 
 - 🎬 [Demo conceptual de Ale](https://qurinawi.vercel.app/), referencia visual y del servidor MCP.
 - 🏆 [Gold for Good Hackathon](https://gold4good.info.bo/site/). Su logo aparece en el pie de la app como crédito a la hackathon.
-- 🎨 El logo de Quri-Ñawi y la ilustración aérea de la cuenca se generaron con ImageGen. Los detalles están en [docs/architecture.md](docs/architecture.md#créditos-de-imagen).
+- 🗺️ Ríos © colaboradores de [OpenStreetMap](https://www.openstreetmap.org/copyright) (ODbL). Relieve: [Terrain Tiles](https://registry.opendata.aws/terrain-tiles/) de Mapzen en AWS Open Data (SRTM, GMTED, ETOPO1). Imagen: NASA Blue Marble vía GIBS. Frontera: Natural Earth.
+- 🎨 El logo de Quri-Ñawi se generó con ImageGen. Los detalles están en [docs/architecture.md](docs/architecture.md#créditos-de-imagen).
 - 🔤 Tipografías Inter y Space Grotesk, con licencia SIL Open Font License 1.1.
 
 ---
