@@ -1,39 +1,27 @@
-# Curinawi
+<p align="center">
+  <img src="public/brand/curinawi.png" alt="Logo de Curinawi: un ojo verde con iris ocre atravesado por un río" width="150">
+</p>
 
-Mapa vivo de estudios y proyectos sobre mercurio, creado por el equipo **Golden Eye** para **Gold for Good · ORO-3.3**.
+<h1 align="center">Curinawi</h1>
 
-Curinawi reúne referencias sobre mercurio en un catálogo geográfico inicial. Cada ficha enlaza la fuente y conserva el contexto de la medición. El piloto se centra en la cuenca del Beni y la primera consulta se plantea en el río Kaka.
+<p align="center">
+  <b>Atlas de evidencia sobre mercurio · Cuenca del Beni, Bolivia</b><br>
+  Explora estudios sobre mercurio, comprueba sus fuentes y decide qué falta investigar.
+</p>
 
-## Base de desarrollo
+<p align="center">
+  <a href="https://github.com/Quri-Nawi/Quri-Nawi/actions/workflows/ci.yml"><img alt="Verificación" src="https://github.com/Quri-Nawi/Quri-Nawi/actions/workflows/ci.yml/badge.svg?branch=main"></a>
+  <img alt="Gold4Good · ORO-3.3" src="https://img.shields.io/badge/Gold4Good-ORO--3.3-C9A227?style=flat-square&labelColor=173B31">
+  <img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=nextdotjs&logoColor=white">
+  <img alt="React 19" src="https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black">
+  <img alt="TypeScript 6" src="https://img.shields.io/badge/TypeScript-6-3178C6?style=flat-square&logo=typescript&logoColor=white">
+  <img alt="Node.js 24 LTS" src="https://img.shields.io/badge/Node.js-24_LTS-5FA04E?style=flat-square&logo=nodedotjs&logoColor=white">
+  <img alt="PWA instalable" src="https://img.shields.io/badge/PWA-instalable-5A0FC8?style=flat-square&logo=pwa&logoColor=white">
+</p>
 
-Requiere la versión de Node.js que indica `.node-version`. Usa npm y el archivo de bloqueo del repositorio.
+<p align="center">
+  <img src="docs/assets/portada.jpg" alt="Portada de Curinawi con el título «Lo que sabemos del río» y una ilustración aérea de la cuenca del Beni" width="100%">
+</p>
 
-```sh
-npm ci --ignore-scripts
-npm run dev
-```
-
-Abre `http://localhost:3000`. La app incluye el atlas esquemático en dos vistas, filtros, comparación, guía Quri, metodología, impacto, catálogo JSON y borradores locales. `/api/health` comprueba el arranque.
-
-El lockfile de npm y el CI ya pasaron la verificación del repositorio. npm viene con la versión de Node fijada y `npm ci` instala según el lockfile. Una migración a pnpm sería viable, con su propio lockfile y cambios de CI. Se conserva un único gestor en esta versión.
-
-## Instalar como PWA
-
-Usa `npm run build` y `npm start` para probar el *service worker* en local. Desde HTTPS, abre **Instalar app** o la opción de instalar del navegador. Una vez cargada en línea, la vista principal y su catálogo inicial pueden consultarse sin conexión.
-
-## Verificaciones
-
-```sh
-npm run check
-npm audit --audit-level=low
-```
-
-Con la aplicación en ejecución, `npm run smoke` comprueba la portada y la ruta de estado.
-
-## Próximos pasos
-
-1. Validar las fichas semilla con revisores y probar una consulta con usuarios.
-2. Incorporar revisión humana, permisos, persistencia e historial.
-3. Conectar el MCP de referencia a la misma vista pública.
-
-[Arquitectura y alcance](docs/architecture.md) · [Contribuir](CONTRIBUTING.md) · [Demo conceptual de Ale](https://qurinawi.vercel.app/).
+> [!NOTE]
+> Curinawi es la aplicación del equipo **Golden Eye** para **Gold for Good · ORO-3.3**, «Mapa vivo de estudios y proyectos sobre mercurio». El piloto se centra en la cuenca del Beni y la primera consulta se plantea en el río Kaka.
