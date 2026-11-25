@@ -12,8 +12,8 @@ export default function HomePage() {
       <a className="skip-link" href="#contenido">Ir al contenido</a>
       <header className="site-header" id="inicio">
         <div className="header-inner">
-          <a className="brand" href="#inicio" aria-label="Curinawi, inicio">
-            <Image src="/brand/curinawi.png" alt="" width={48} height={39} unoptimized />
+          <a className="brand" href="#inicio" aria-label={project.name + ", inicio"}>
+            <Image src="/brand/quri-nawi.png" alt="" width={48} height={39} unoptimized />
             <span>{project.name}</span>
           </a>
           <nav className="main-nav" aria-label="Navegación principal">

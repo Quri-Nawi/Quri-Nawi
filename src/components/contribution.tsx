@@ -3,7 +3,9 @@
 import { useEffect, useState, type FormEvent } from "react";
 
 type Draft = { title: string; url: string; territory: string };
-const key = "curinawi:proposals:v1";
+const key = "quri-nawi:proposals:v1";
+// Borradores guardados antes del cambio de nombre; se leen si aún no hay borradores con la clave nueva.
+const previousKey = "curinawi:proposals:v1";
 
 function isDraft(item: unknown): item is Draft {
   if (typeof item !== "object" || item === null) return false;
@@ -17,7 +19,7 @@ export function Contribution() {
 
   useEffect(() => {
     try {
-      const saved: unknown = JSON.parse(localStorage.getItem(key) ?? "[]");
+      const saved: unknown = JSON.parse(localStorage.getItem(key) ?? localStorage.getItem(previousKey) ?? "[]");
       if (Array.isArray(saved)) setDrafts(saved.filter(isDraft));
     } catch {
       setFeedback("No se pudieron recuperar los borradores de este navegador.");

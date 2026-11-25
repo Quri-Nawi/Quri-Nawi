@@ -1,8 +1,8 @@
 /* global self, caches, fetch, URL, Response */
-const CACHE = "curinawi-public-v1";
+const CACHE = "quri-nawi-public-v1";
 const shellFiles = [
   "/manifest.webmanifest",
-  "/brand/curinawi.png",
+  "/brand/quri-nawi.png",
   "/brand/app-192.png",
   "/brand/app-512.png",
   "/brand/gold-for-good.svg",
@@ -27,7 +27,7 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil((async () => {
     for (const key of await caches.keys()) {
-      if (key.startsWith("curinawi-public-") && key !== CACHE) await caches.delete(key);
+      if (key !== CACHE) await caches.delete(key);
     }
     await self.clients.claim();
   })());
@@ -53,7 +53,7 @@ self.addEventListener("fetch", (event) => {
       if (isHome && response.status >= 500) return (await cache.match("/")) ?? response;
       return response;
     } catch {
-      return (await cache.match(isHome ? "/" : request)) ?? new Response("Curinawi no está disponible sin conexión.", { status: 503 });
+      return (await cache.match(isHome ? "/" : request)) ?? new Response("Quri-Ñawi no está disponible sin conexión.", { status: 503 });
     }
   })());
 });
