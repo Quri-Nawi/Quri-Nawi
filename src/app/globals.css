@@ -1,0 +1,21 @@
+:root {
+  color-scheme: light;
+  color: #16332b;
+  background: #f5f5ef;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  max-width: 44rem;
+  margin-inline: auto;
+  padding: 4rem 1.5rem;
+}
+
+h1 {
+  margin-block: 0.25rem;
+  font-size: clamp(2.5rem, 8vw, 4rem);
+}
