@@ -112,3 +112,30 @@ pie showData
 
 > [!IMPORTANT]
 > Las dos fichas del Kaka remiten a la misma revisión. Los peces se compraron en mercados de Riberalta y Rurrenabaque, así que la ficha no confirma el punto de captura. La ficha de salud enlaza el informe y omite datos individuales y ubicaciones precisas.
+
+## 🧱 Arquitectura
+
+```mermaid
+flowchart TB
+    C[("📚 src/lib/catalog.ts<br>catálogo semilla")]
+    C --> P["🖥️ Portada<br>src/app/page.tsx"]
+    C --> J["🔗 /api/catalogo<br>JSON público"]
+    P --> A["🗺️ Atlas y relieve<br>atlas.tsx · terrain.tsx"]
+    P --> K["⚖️ Comparación<br>comparison.tsx"]
+    P --> B["✍️ Aportes<br>contribution.tsx"]
+    B --> L[("💾 localStorage<br>borradores")]
+    SW["📦 public/sw.js"] -. caché sin conexión .-> P
+    SW -. caché .-> J
+    H["🩺 /api/health"]
+```
+
+| Lugar | Responsabilidad |
+| --- | --- |
+| `src/app` | Portada, estilos, manifiesto PWA y rutas HTTP (`/api/catalogo`, `/api/health`). |
+| `src/components` | Atlas, relieve, comparación, aportes, guía Quri, instalación y secciones de método, impacto, agentes y escala. |
+| `src/lib` | Identidad del proyecto y catálogo semilla. |
+| `public` | Logo, íconos, ilustración de la cuenca, tipografías y *service worker*. |
+| `scripts/smoke.mjs` | Prueba HTTP de la app en ejecución. |
+| `.github` | CI de verificación y actualizaciones con Dependabot. |
+
+Más detalle en [docs/architecture.md](docs/architecture.md).
