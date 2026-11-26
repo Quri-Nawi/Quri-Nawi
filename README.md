@@ -50,7 +50,7 @@ La aplicación ya cubre el recorrido de consulta: explorar la cuenca, abrir la f
 | 🧾 **Extracción y revisión** | ⏳ | — | Cargar un PDF, sugerir campos con página y corregir antes de publicar. |
 | 🔐 **Permisos e historial** | ⏳ | Solo se sirven registros públicos. | Roles, historial, retiro y registros restringidos. |
 | 📱 **PWA** | ✅ | Instalable. Tras la primera carga, la portada y el catálogo se consultan sin conexión. | — |
-| 🤖 **Agentes** | 🟡 | Catálogo y respaldo en JSON en `/api/catalogo` y `/api/fuentes`. | Conectar el MCP de referencia a la misma vista. |
+| 🤖 **Agentes** | 🟡 | Catálogo y respaldo en JSON en `/api/catalogo` y `/api/fuentes`, con ID, versión, procedencia y fecha de consulta. | Desplegar el adaptador de lectura de GoldEye Trace; revisar cada ficha antes de autorizarla en su catálogo canónico. |
 | 👥 **Validación con usuarios** | ⏳ | Plan y criterio de éxito en [docs/viabilidad.md](docs/viabilidad.md). | Hacer la prueba con 5 a 8 personas. **Aún no se ha hecho.** |
 | 🧪 **Calidad** | ✅ | CI con validación de datos, lint, tipos, compilación y `npm audit`; prueba HTTP de portada, respaldo, APIs y PWA. | Pruebas en navegador. |
 
@@ -149,6 +149,7 @@ pie showData
 | [docs/fuentes](docs/fuentes/README.md) | Registro de fuentes, matriz de cifras, conflictos, comprobación de fuentes y límites. |
 | [docs/fuentes/REDACCION_DE_CIFRAS.md](docs/fuentes/REDACCION_DE_CIFRAS.md) | Cómo citar cada cifra y cuáles no deben usarse. |
 | [docs/viabilidad.md](docs/viabilidad.md) | Qué está demostrado, qué no, y cómo se probará el uso. |
+| [docs/contrato-mcp-web.md](docs/contrato-mcp-web.md) | Contrato de lectura web–MCP, mapeo de campos y separación entre semillas y fichas autorizadas. |
 
 ## 🧭 Viabilidad
 

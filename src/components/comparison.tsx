@@ -1,6 +1,7 @@
-import { verificationLabel, type Record } from "../lib/catalog";
+import { verificationLabel } from "../lib/catalog";
+import type { CatalogRecord } from "../lib/public-catalog";
 
-export function Comparison({ selected, onClear }: { selected: readonly Record[]; onClear: () => void }) {
+export function Comparison({ selected, onClear }: { selected: readonly CatalogRecord[]; onClear: () => void }) {
   const [first, second] = selected;
   const kakaPair = first?.id.startsWith("kaka-") && second?.id.startsWith("kaka-");
   const mixedTypes = first && second && first.evidenceType !== second.evidenceType;
@@ -17,6 +18,7 @@ export function Comparison({ selected, onClear }: { selected: readonly Record[];
             <div className="compare-slot" key={index}>
               {record ? <>
                 <p className="eyebrow">{record.area} · {record.matrix}</p>
+                <p className="record-meta">{record.id} · v{record.version} · pendiente de autorización MCP</p>
                 {record.observation ? <div className="measurement">{record.observation.value}<span> {record.observation.unit}</span></div> : <h3>{record.title}</h3>}
                 <p>{record.observation?.season ?? record.matrix} · Muestreo {record.sample}</p>
                 <p className="compare-status"><span className={"verif verif-" + record.verification}>{verificationLabel[record.verification]}</span> {record.evidenceType}</p>

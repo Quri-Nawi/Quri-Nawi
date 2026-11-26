@@ -1,5 +1,5 @@
-/* global self, caches, fetch, URL, Response */
-const CACHE = "quri-nawi-public-v4";
+/* global self, caches, fetch, URL, Response, Headers */
+const CACHE = "quri-nawi-public-v5";
 const shellFiles = [
   "/manifest.webmanifest",
   "/brand/quri-nawi.png",
@@ -15,6 +15,13 @@ const shellFiles = [
 // Datos públicos: se consultan en línea y, sin conexión, se usa la última copia guardada.
 const dataRoutes = ["/api/catalogo", "/api/fuentes"];
 
+function markCopy(response, mode) {
+  const headers = new Headers(response.headers);
+  headers.set("X-Quri-Copy", mode);
+  if (!headers.has("X-Quri-Cached-At")) headers.set("X-Quri-Cached-At", new Date().toISOString());
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
 self.addEventListener("install", (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE);
@@ -24,7 +31,10 @@ self.addEventListener("install", (event) => {
     const chunks = [...html.matchAll(/(?:src|href)="(\/_next\/static\/[^"]+)"/g)].map((match) => match[1]);
     await cache.addAll([...new Set([...shellFiles, ...chunks])]);
     await cache.put("/", home);
-    await Promise.allSettled(dataRoutes.map((route) => cache.add(route)));
+    await Promise.allSettled(dataRoutes.map(async (route) => {
+      const response = await fetch(route);
+      if (response.ok) await cache.put(route, markCopy(response, "online"));
+    }));
     await self.skipWaiting();
   })());
 });
@@ -66,12 +76,15 @@ self.addEventListener("fetch", (event) => {
     }
     try {
       const response = await fetch(request);
-      if (response.ok) await cache.put(key, response.clone());
-      if ((isHome || isData) && response.status >= 500) return (await cache.match(key)) ?? response;
+      if (response.ok) await cache.put(key, isData ? markCopy(response.clone(), "online") : response.clone());
+      if ((isHome || isData) && response.status >= 500) {
+        const cached = await cache.match(key);
+        return cached && isData ? markCopy(cached, "offline") : cached ?? response;
+      }
       return response;
     } catch {
       const cached = await cache.match(key);
-      if (cached) return cached;
+      if (cached) return isData ? markCopy(cached, "offline") : cached;
       if (isData) return new Response(JSON.stringify({ error: "Sin conexión y sin copia guardada." }), { status: 503, headers: { "Content-Type": "application/json" } });
       return new Response("Quri-Ñawi no está disponible sin conexión.", { status: 503 });
     }

@@ -1,17 +1,10 @@
 import Image from "next/image";
-import { Atlas } from "../components/atlas";
-import { BasinHero } from "../components/basin-hero";
+import { CatalogExperience } from "../components/catalog-experience";
 import { Contribution } from "../components/contribution";
 import { Evidence } from "../components/evidence";
-import { Guide } from "../components/guide";
 import { InstallApp } from "../components/install-app";
 import { ProjectSections } from "../components/project-sections";
-import { records } from "../lib/catalog";
-import { sources } from "../lib/evidence";
 import { project } from "../lib/project";
-
-const used = new Set(records.flatMap((record) => record.sourceIds));
-const sourceLinks = Object.fromEntries(sources.filter(({ id }) => used.has(id)).map(({ id, title, url }) => [id, { title, url }]));
 
 export default function HomePage() {
   return (
@@ -30,9 +23,7 @@ export default function HomePage() {
         </div>
       </header>
       <main id="contenido" tabIndex={-1}>
-        <BasinHero />
-        <div className="section-inner guide-strip"><p>¿Primera vez? Sigue el recorrido de tres pasos.</p><Guide /></div>
-        <Atlas sourceLinks={sourceLinks} />
+        <CatalogExperience />
         <ProjectSections />
         <Evidence />
         <Contribution />

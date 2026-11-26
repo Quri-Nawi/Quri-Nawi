@@ -20,9 +20,9 @@ export function ProjectSections() {
         </section>
         <section className="agent-panel anchor-section" id="agentes" aria-labelledby="agent-title">
           <p className="eyebrow">Agentes e interoperabilidad</p>
-          <h2 id="agent-title">El mismo catálogo, en JSON.</h2>
-          <p>Consulta los registros públicos y sus fuentes. El MCP de Jhamil es un servicio separado. La conexión con este catálogo requiere conservar los mismos identificadores, fuentes y estados.</p>
-          <div className="basin-actions"><a className="button outline" href="/api/catalogo" target="_blank" rel="noreferrer">Abrir catálogo JSON ↗</a><a className="button outline" href="/api/fuentes" target="_blank" rel="noreferrer">Fuentes y cifras JSON ↗</a></div>
+          <h2 id="agent-title">Dos catálogos, estados claros.</h2>
+          <p>Esta web ofrece las fichas revisadas y su respaldo con ID, versión, procedencia y fecha de consulta. Siguen pendientes de autorización en GoldEye Trace. Su catálogo canónico publica únicamente fichas aprobadas por una persona revisora; hoy no incluye estas semillas. El contrato de lectura permite consultar estas API desde el MCP sin cambiar ese estado.</p>
+          <div className="basin-actions"><a className="button outline" href="/api/catalogo" target="_blank" rel="noreferrer">Abrir catálogo web JSON ↗</a><a className="button outline" href="/api/fuentes" target="_blank" rel="noreferrer">Fuentes y cifras JSON ↗</a><a className="button outline" href="https://goldeye-trace-mcp.pinata-server.workers.dev/llms.txt" target="_blank" rel="noreferrer">Guía de GoldEye Trace ↗</a></div>
         </section>
       </div>
     </div>

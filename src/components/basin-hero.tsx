@@ -1,29 +1,28 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { areas, records, verificationLabel, type Record as Study } from "../lib/catalog";
+import { areas, verificationLabel } from "../lib/catalog";
+import type { CatalogRecord } from "../lib/public-catalog";
 import type { BasinScene, Geo } from "./basin-scene";
 
 const checked = ["agua", "sedimentos", "peces"];
-const studiesOf = (river: string) => records.filter((record) => record.area === river);
+const studiesOf = (records: readonly CatalogRecord[], river: string) => records.filter((record) => record.area === river);
 const plural = (count: number) => (count === 1 ? "1 ficha" : count + " fichas");
 
-function gapText(river: string) {
-  const present = new Set(studiesOf(river).map((record) => record.matrix.toLowerCase()));
+function gapText(records: readonly CatalogRecord[], river: string) {
+  const present = new Set(studiesOf(records, river).map((record) => record.matrix.toLowerCase()));
   const missing = checked.filter((matrix) => !present.has(matrix)).map((matrix) => "de " + matrix);
   if (missing.length === 0) return "";
   const list = missing.length === 1 ? missing[0] : missing.slice(0, -1).join(", ") + " ni " + missing[missing.length - 1];
   return `En este catálogo todavía no hay fichas ${list} para este río.`;
 }
 
-const anchors = records.flatMap((record) => record.places.map((place) => ({ id: record.id, lon: place.lon, lat: place.lat })));
-const highlighted = new Set<string>(areas);
-
-function StudyLabel({ record, setRef }: { record: Study; setRef: (node: HTMLElement | null) => void }) {
+function StudyLabel({ record, setRef }: { record: CatalogRecord; setRef: (node: HTMLElement | null) => void }) {
   return (
     <article className="study-label" ref={setRef}>
       <p className="study-top"><span className={"matrix-chip matrix-" + record.matrix.split(" ")[0].toLowerCase()}>{record.matrix}</span><span className={"verif verif-" + record.verification}>{verificationLabel[record.verification]}</span></p>
       <h3>{record.title}</h3>
+      <p className="study-identity">{record.id} · v{record.version} · pendiente de autorización MCP</p>
       {record.observation && <p className="study-value">{record.observation.value}<small>{record.observation.unit}</small><span>{record.observation.season}</span></p>}
       <dl className="study-dates">
         <div><dt>Muestreo</dt><dd>{record.sample}</dd></div>
@@ -35,7 +34,9 @@ function StudyLabel({ record, setRef }: { record: Study; setRef: (node: HTMLElem
   );
 }
 
-export function BasinHero() {
+export function BasinHero({ records }: { records: readonly CatalogRecord[] }) {
+  const anchors = records.flatMap((record) => record.places.map((place) => ({ id: record.id, lon: place.lon, lat: place.lat })));
+  const highlighted = new Set<string>(records.map((record) => record.area));
   const hostRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<BasinScene | null>(null);
@@ -111,6 +112,7 @@ export function BasinHero() {
             }
           },
         });
+        if (selectedRef.current) sceneRef.current.focus(selectedRef.current);
         setStatus("ready");
         if (shared && geo.rivers.some((river) => river.name === shared)) setSelected(shared);
       } catch {
@@ -122,7 +124,7 @@ export function BasinHero() {
       sceneRef.current?.dispose();
       sceneRef.current = null;
     };
-  }, []);
+  }, [records]);
 
   useEffect(() => {
     selectedRef.current = selected;
@@ -157,7 +159,7 @@ export function BasinHero() {
     document.getElementById("explorar")?.scrollIntoView();
   }
 
-  const studies = selected ? studiesOf(selected) : [];
+  const studies = selected ? studiesOf(records, selected) : [];
   const tag = (kind: string, name: string, lon: number, lat: number) => (node: HTMLElement | null) => {
     const key = kind + name;
     if (node) { node.dataset.at = `${kind}|${lon}|${lat}`; tagRefs.current.set(key, node); } else tagRefs.current.delete(key);
@@ -175,13 +177,13 @@ export function BasinHero() {
         {places.map((place) => <span key={place.name} className="place-tag" ref={tag("place", place.name, place.lon, place.lat)}>{place.name}</span>)}
         {riverTags.filter((river) => !selected || river.name === selected).map((river) => (
           <span key={river.name} className={"river-tag" + (highlighted.has(river.name) ? " has-studies" : "")} ref={tag("river", river.name, river.lon, river.lat)}>
-            Río {river.name}{highlighted.has(river.name) ? <b>{studiesOf(river.name).length}</b> : null}
+            Río {river.name}{highlighted.has(river.name) ? <b>{studiesOf(records, river.name).length}</b> : null}
           </span>
         ))}
       </div>}
 
       {hover && !selected && <p className="river-hover" style={{ transform: `translate(${hover.x + 14}px, ${hover.y + 12}px)` }} aria-hidden="true">
-        <strong>Río {hover.river}</strong>{studiesOf(hover.river).length ? plural(studiesOf(hover.river).length) + " · clic para acercar" : "Sin fichas en el catálogo · clic para ver"}
+        <strong>Río {hover.river}</strong>{studiesOf(records, hover.river).length ? plural(studiesOf(records, hover.river).length) + " · clic para acercar" : "Sin fichas en el catálogo · clic para ver"}
       </p>}
 
       <div className="basin-intro">
@@ -197,7 +199,7 @@ export function BasinHero() {
       <nav className="river-chips" aria-label="Ríos con fichas">
         {areas.map((river) => (
           <button key={river} type="button" aria-pressed={selected === river} onClick={() => setSelected(selected === river ? null : river)} disabled={status !== "ready"}>
-            Río {river}<span>{studiesOf(river).length}</span>
+            Río {river}<span>{studiesOf(records, river).length}</span>
           </button>
         ))}
       </nav>
@@ -231,7 +233,7 @@ export function BasinHero() {
         <div className="river-panel" ref={panelRef} role="region" aria-label={"Río " + selected}>
           <p className="eyebrow">{studies.length ? plural(studies.length) + " en el catálogo" : "Sin fichas en el catálogo"}</p>
           <h2>Río {selected}</h2>
-          <p>{studies.length ? gapText(selected) : "Todavía no cargamos estudios de este río. ¿Conoces uno? Propónlo para revisión."}{studies.length > 4 && <span className="solo-escritorio"> En pantalla se muestran 4; el resto está en la lista.</span>}</p>
+          <p>{studies.length ? gapText(records, selected) : "Todavía no cargamos estudios de este río. ¿Conoces uno? Propónlo para revisión."}{studies.length > 4 && <span className="solo-escritorio"> En pantalla se muestran 4; el resto está en la lista.</span>}</p>
           <div className="basin-actions">
             <button className="button gold" type="button" onClick={() => setSelected(null)}>← Volver a la cuenca</button>
             {studies.length ? <button className="button ghost" type="button" onClick={() => showInList(selected)}>Ver en la lista ↓</button>

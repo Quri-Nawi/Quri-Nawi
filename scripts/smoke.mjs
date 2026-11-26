@@ -21,15 +21,21 @@ const catalog = await fetch(new URL("/api/catalogo", origin), options);
 assert.equal(catalog.status, 200);
 const dataset = await catalog.json();
 assert.equal(dataset.catalog, "Quri-Ñawi");
+assert.equal(dataset.provenance.kind, "semillas_pendientes_mcp");
+assert.equal(dataset.provenance.authority, "no_publicadas_en_goldeye_trace");
+assert.ok(dataset.version && !Number.isNaN(Date.parse(dataset.consultedAt)));
 assert.ok(dataset.records.every(({ url }) => new URL(url).protocol === "https:"));
 assert.ok(dataset.records.some(({ id }) => id === "kaka-seca"));
 assert.ok(dataset.records.every(({ verification, claims, limits, sourceIds }) => verification && claims.length > 0 && limits.length > 0 && sourceIds.length > 0), "cada ficha declara verificación, qué se comprobó, límites y fuentes");
+assert.ok(dataset.records.every(({ version, publicationStatus }) => version === dataset.version && publicationStatus === "pendiente_revision_mcp"));
 
 assert.match(catalog.headers.get("cache-control") ?? "", /s-maxage/);
 
 const evidence = await fetch(new URL("/api/fuentes", origin), options);
 assert.equal(evidence.status, 200);
 const proof = await evidence.json();
+assert.equal(proof.version, dataset.version);
+assert.equal(proof.provenance.kind, "respaldo_documental");
 assert.equal(proof.summary.sources, proof.sources.length);
 assert.equal(proof.summary.figures, proof.figures.length);
 const known = new Set(proof.sources.map(({ id }) => id));
