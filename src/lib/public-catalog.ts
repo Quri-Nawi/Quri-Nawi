@@ -1,4 +1,4 @@
-import { catalogVersion, records, type Record as Study } from "./catalog";
+import { areas, catalogVersion, matrices, records, verificationLabel, type Area, type Matrix, type Record as Study, type Verification } from "./catalog";
 import { checkedOn, sources } from "./evidence";
 
 export type CatalogRecord = Study & { version: string; publicationStatus: "pendiente_revision_mcp" };
@@ -33,6 +33,8 @@ function validRecord(value: unknown): value is CatalogRecord {
   if (!object(value) || !object(value.observation) && value.observation !== undefined) return false;
   const fields = ["id", "title", "area", "matrix", "sample", "published", "source", "url", "note", "verification", "evidenceType", "checked", "precision", "version"];
   if (!fields.every((key) => typeof value[key] === "string" && (value[key] as string).length > 0)) return false;
+  if (!areas.includes(value.area as Area) || !matrices.includes(value.matrix as Matrix) || !Object.hasOwn(verificationLabel, value.verification as Verification)) return false;
+  if (value.observation && (!object(value.observation) || !["value", "unit", "season"].every((key) => typeof (value.observation as { [key: string]: unknown })[key] === "string"))) return false;
   if (value.publicationStatus !== "pendiente_revision_mcp" || !strings(value.claims) || !value.claims.length || !strings(value.limits) || !value.limits.length || !strings(value.sourceIds) || !value.sourceIds.length) return false;
   if (!Array.isArray(value.places) || !value.places.every((place) => object(place) && typeof place.name === "string" && typeof place.lon === "number" && Number.isFinite(place.lon) && typeof place.lat === "number" && Number.isFinite(place.lat))) return false;
   try { return new URL(value.url as string).protocol === "https:"; } catch { return false; }
