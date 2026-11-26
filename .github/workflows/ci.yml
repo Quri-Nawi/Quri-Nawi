@@ -11,9 +11,14 @@ permissions:
 env:
   NEXT_TELEMETRY_DISABLED: "1"
 
+concurrency:
+  group: verificacion-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
@@ -23,3 +28,16 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm run check
       - run: npm audit --audit-level=low
+      - name: Prueba de humo con la compilación de producción
+        run: |
+          npm start > servidor.log 2>&1 &
+          servidor=$!
+          for intento in $(seq 1 30); do
+            curl --silent --fail http://localhost:3000/api/health > /dev/null && break
+            sleep 1
+          done
+          npm run smoke
+          kill "$servidor"
+      - name: Registro del servidor
+        if: failure()
+        run: cat servidor.log

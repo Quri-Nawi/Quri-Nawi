@@ -22,6 +22,7 @@ export type SceneOptions = {
   onPick: (river: string | null) => void;
   onHover: (river: string | null, x: number, y: number) => void;
   onFrame: (project: (lon: number, lat: number, lift?: number) => { x: number; y: number; visible: boolean }) => void;
+  onContextLost?: () => void;
 };
 
 export type BasinScene = {
@@ -340,6 +341,13 @@ export function createBasinScene(options: SceneOptions): BasinScene {
   const clock = new THREE.Clock();
   const flowPositions = flowGeometry.attributes.position as THREE.BufferAttribute;
   let frame = 0;
+  // Si el navegador pierde el contexto WebGL (poca memoria, cambio de GPU), se detiene el dibujo y se avisa.
+  const onContextLost = (event: Event) => {
+    event.preventDefault();
+    cancelAnimationFrame(frame);
+    options.onContextLost?.();
+  };
+  renderer.domElement.addEventListener("webglcontextlost", onContextLost);
   const loop = () => {
     frame = requestAnimationFrame(loop);
     const delta = Math.min(clock.getDelta(), 0.1);
@@ -410,6 +418,7 @@ export function createBasinScene(options: SceneOptions): BasinScene {
       resizer.disconnect();
       watcher.disconnect();
       controls.dispose();
+      renderer.domElement.removeEventListener("webglcontextlost", onContextLost);
       renderer.domElement.removeEventListener("pointerdown", onDown);
       renderer.domElement.removeEventListener("pointerup", onUp);
       renderer.domElement.removeEventListener("pointermove", onMove);
