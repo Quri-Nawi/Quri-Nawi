@@ -2,6 +2,7 @@
 // Uso: npm run datos   (Node 24 lee los .ts directamente)
 import { readFileSync } from "node:fs";
 import { records } from "../src/lib/catalog.ts";
+import { authorships } from "../src/lib/authorship.ts";
 import { checkedOn, figureStatusLabel, figures, sources, summarize } from "../src/lib/evidence.ts";
 
 const fallos = [];
@@ -36,6 +37,25 @@ for (const r of records) {
   comprobar(sources.some((s) => s.url === r.url || s.moreUrls.includes(r.url)), `${r.id}: su URL principal no figura en el registro de fuentes.`);
   if (r.verification === "primaria") comprobar(r.sourceIds.some((id) => sources.find((s) => s.id === id)?.kind !== "Prensa"), `${r.id}: marcada primaria sin una fuente que no sea prensa.`);
 }
+
+// 3b. Los créditos vinculan una obra identificable y su fuente de autoría a fichas reales.
+comprobar(unicos(authorships.map((entry) => entry.workId)), "Hay obras de autoría repetidas.");
+comprobar(unicos(authorships.flatMap((entry) => entry.recordIds)), "Una ficha aparece en varios grupos de autoría.");
+for (const entry of authorships) {
+  comprobar(ids.has(entry.workId), `${entry.workId}: obra sin fuente en el registro.`);
+  comprobar(entry.recordIds.length > 0, `${entry.workId}: obra sin fichas vinculadas.`);
+  for (const recordId of entry.recordIds) {
+    const record = records.find((item) => item.id === recordId);
+    comprobar(Boolean(record), `${entry.workId}: ficha ${recordId} inexistente.`);
+    comprobar(Boolean(record?.sourceIds.includes(entry.workId)), `${recordId}: no cita la obra ${entry.workId}.`);
+    for (const credit of entry.credits) {
+      comprobar(credit.name.trim().length > 0 && credit.role.trim().length > 0, `${recordId}: crédito incompleto.`);
+      comprobar(ids.has(credit.sourceId) && Boolean(record?.sourceIds.includes(credit.sourceId)), `${recordId}: crédito de ${credit.name} sin procedencia ${credit.sourceId}.`);
+      if (credit.profileUrl) comprobar(new URL(credit.profileUrl).protocol === "https:", `${recordId}: perfil no HTTPS.`);
+    }
+  }
+}
+for (const record of records) comprobar(authorships.some((entry) => entry.recordIds.includes(record.id)), `${record.id}: sin estado de autoría.`);
 
 // 4. Cada cifra cita fuentes existentes y tiene redacción segura; los conflictos dicen cuál es el conflicto
 for (const f of figures) {

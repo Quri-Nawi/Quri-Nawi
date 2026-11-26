@@ -44,6 +44,7 @@ export function BasinHero({ records }: { records: readonly CatalogRecord[] }) {
   const tagRefs = useRef(new Map<string, HTMLElement>());
   const labelRefs = useRef(new Map<string, HTMLElement>());
   const selectedRef = useRef<string | null>(null);
+  const sharedRiver = useRef<string | undefined>(undefined);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [selected, setSelected] = useState<string | null>(null);
   const [hover, setHover] = useState<{ river: string; x: number; y: number } | null>(null);
@@ -54,7 +55,7 @@ export function BasinHero({ records }: { records: readonly CatalogRecord[] }) {
   useEffect(() => {
     let disposed = false;
     // Un enlace como /?rio=Kaka abre la portada directamente en ese río; se lee antes de que la selección reescriba la URL.
-    const shared = new URLSearchParams(window.location.search).get("rio");
+    if (sharedRiver.current === undefined) sharedRiver.current = new URLSearchParams(window.location.search).get("rio") ?? "";
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reducedMotion) setRotating(false);
     (async () => {
@@ -114,7 +115,10 @@ export function BasinHero({ records }: { records: readonly CatalogRecord[] }) {
         });
         if (selectedRef.current) sceneRef.current.focus(selectedRef.current);
         setStatus("ready");
-        if (shared && geo.rivers.some((river) => river.name === shared)) setSelected(shared);
+        if (sharedRiver.current && geo.rivers.some((river) => river.name === sharedRiver.current)) {
+          setSelected(sharedRiver.current);
+          sharedRiver.current = "";
+        }
       } catch {
         if (!disposed) setStatus("error");
       }
@@ -125,6 +129,15 @@ export function BasinHero({ records }: { records: readonly CatalogRecord[] }) {
       sceneRef.current = null;
     };
   }, [records]);
+
+  useEffect(() => {
+    const openRiver = (event: Event) => {
+      const river = (event as CustomEvent<unknown>).detail;
+      if (areas.includes(river as typeof areas[number])) setSelected(river as string);
+    };
+    window.addEventListener("quri:river", openRiver);
+    return () => window.removeEventListener("quri:river", openRiver);
+  }, []);
 
   useEffect(() => {
     selectedRef.current = selected;
