@@ -13,7 +13,8 @@
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
     "check": "npm run lint && npm run typecheck && npm run build",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "tts:generate": "node scripts/generar-audios-quri.mjs"
   },
   "dependencies": {
     "next": "16.4.6",

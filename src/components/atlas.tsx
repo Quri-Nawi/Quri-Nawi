@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { areas, matrices, records, type Area } from "../lib/catalog";
 import { Comparison } from "./comparison";
+import { QuriAssistant } from "./quri-assistant";
 import { Terrain } from "./terrain";
 
 function normalize(value: string) {
@@ -66,6 +67,7 @@ export function Atlas() {
               <label>Territorio<select value={area} onChange={(event) => setArea(event.target.value as Area | "")}><option value="">Todos</option>{areas.map((item) => <option key={item}>{item}</option>)}</select></label>
               <label>Tipo de muestra<select value={matrix} onChange={(event) => setMatrix(event.target.value)}><option value="">Todos</option>{matrices.map((item) => <option key={item}>{item}</option>)}</select></label>
             </div>
+            {area && <QuriAssistant river={area} theme="light" />}
             <div className="result-head">
               <p aria-live="polite">{matching.length} {matching.length === 1 ? "ficha" : "fichas"}</p>
               <a href="#comparar">Comparar ({chosen.length}) ↓</a>

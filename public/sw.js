@@ -40,7 +40,7 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (request.method !== "GET" || url.origin !== self.location.origin) return;
   const isHome = request.mode === "navigate" && url.pathname === "/";
-  const isAsset = url.pathname.startsWith("/_next/static/") || shellFiles.includes(url.pathname);
+  const isAsset = url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/audio/") || shellFiles.includes(url.pathname);
   if (!isHome && !isAsset) return;
 
   event.respondWith((async () => {

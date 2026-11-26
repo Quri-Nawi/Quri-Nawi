@@ -6,11 +6,15 @@ La primera versión usa el App Router de Next.js con TypeScript y npm. La portad
 | --- | --- |
 | `src/app` | Rutas, interfaz y respuestas HTTP. |
 | `src/app/api/catalogo` | Catálogo público en JSON para personas y agentes. |
+| `src/app/api/quri-tts` | Síntesis de voz en servidor para guiones revisados de Quri, con control de longitud, cuota y caché. |
 | `src/app/api/health` | Estado del servidor, sin caché. |
 | `src/app/manifest.ts` | Manifiesto de la PWA: nombre, colores e íconos instalables. |
 | `src/lib/project.ts` | Identidad y datos públicos del proyecto. |
 | `src/lib/catalog.ts` | Catálogo semilla. La interfaz y la API usan los mismos registros públicos. |
+| `src/lib/quri-scripts.ts` | Guiones versionados (`v1`) por río con separación muestreo/publicación, fuentes y vacíos del catálogo. |
 | `src/components/basin-hero.tsx` | Portada 3D: etiquetas de estudios, líneas guía, panel del río, chips y controles accesibles. |
+| `src/components/quri-assistant.tsx` | Asistente contextual Quri: reproducción, pausa, detención, transcripción, minimización y fallback de lectura. |
+| `src/components/quri-mascot.tsx` | Personaje vectorial SVG de Quri (medallón, busto y cuerpo entero) con soporte para movimiento reducido. |
 | `src/components/basin-scene.ts` | Escena Three.js: relieve real, ríos, marcadores, giro automático, zoom al río y clic por *raycasting*. Se carga aparte para no frenar la portada. |
 | `src/components` | Atlas esquemático, comparación, borradores locales, guía, instalación y secciones. |
 | `public/sw.js` | Caché de la vista principal y de sus recursos públicos. |
