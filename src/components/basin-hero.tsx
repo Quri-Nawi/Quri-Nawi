@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { areas, records, type Record as Study } from "../lib/catalog";
+import { areas, records, verificationLabel, type Record as Study } from "../lib/catalog";
 import type { BasinScene, Geo } from "./basin-scene";
 
 const checked = ["agua", "sedimentos", "peces"];
@@ -22,7 +22,7 @@ const highlighted = new Set<string>(areas);
 function StudyLabel({ record, setRef }: { record: Study; setRef: (node: HTMLElement | null) => void }) {
   return (
     <article className="study-label" ref={setRef}>
-      <p className="study-top"><span className={"matrix-chip matrix-" + record.matrix.split(" ")[0].toLowerCase()}>{record.matrix}</span><span>{record.review}</span></p>
+      <p className="study-top"><span className={"matrix-chip matrix-" + record.matrix.split(" ")[0].toLowerCase()}>{record.matrix}</span><span className={"verif verif-" + record.verification}>{verificationLabel[record.verification]}</span></p>
       <h3>{record.title}</h3>
       {record.observation && <p className="study-value">{record.observation.value}<small>{record.observation.unit}</small><span>{record.observation.season}</span></p>}
       <dl className="study-dates">
@@ -37,6 +37,7 @@ function StudyLabel({ record, setRef }: { record: Study; setRef: (node: HTMLElem
 
 export function BasinHero() {
   const hostRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<BasinScene | null>(null);
   const linesRef = useRef<SVGSVGElement>(null);
   const tagRefs = useRef(new Map<string, HTMLElement>());
@@ -82,6 +83,7 @@ export function BasinHero() {
           coarsePointer: window.matchMedia("(pointer: coarse)").matches,
           onPick: (river) => { if (river || selectedRef.current) setSelected(river); },
           onHover: (river, x, y) => setHover(river ? { river, x, y } : null),
+          onContextLost: () => { if (!disposed) setStatus("error"); },
           onFrame: (project) => {
             for (const node of tagRefs.current.values()) {
               const [kind, lon, lat] = node.dataset.at!.split("|");
@@ -97,6 +99,7 @@ export function BasinHero() {
               const record = records.find((item) => item.id === path.dataset.id);
               if (!label || !record) continue;
               const rect = label.getBoundingClientRect();
+              if (!rect.width) { path.removeAttribute("d"); continue; }
               const left = rect.left + rect.width / 2 < box.left + box.width / 2;
               const x0 = (left ? rect.right : rect.left) - box.left;
               const y0 = rect.top + 34 - box.top;
@@ -131,6 +134,17 @@ export function BasinHero() {
     const close = (event: KeyboardEvent) => { if (event.key === "Escape") setSelected(null); };
     window.addEventListener("keydown", close);
     return () => window.removeEventListener("keydown", close);
+  }, [selected]);
+
+  useEffect(() => {
+    const panel = panelRef.current;
+    const hero = panel?.closest<HTMLElement>(".basin-hero");
+    if (!panel || !hero) return;
+    const resize = new ResizeObserver(() => {
+      hero.style.setProperty("--river-panel-height", `${panel.getBoundingClientRect().height}px`);
+    });
+    resize.observe(panel);
+    return () => resize.disconnect();
   }, [selected]);
 
   function toggleRotation() {
@@ -214,10 +228,10 @@ export function BasinHero() {
             </div>
           ))}
         </div>
-        <div className="river-panel" role="region" aria-label={"Río " + selected}>
+        <div className="river-panel" ref={panelRef} role="region" aria-label={"Río " + selected}>
           <p className="eyebrow">{studies.length ? plural(studies.length) + " en el catálogo" : "Sin fichas en el catálogo"}</p>
           <h2>Río {selected}</h2>
-          <p>{studies.length ? gapText(selected) : "Todavía no cargamos estudios de este río. ¿Conoces uno? Propónlo para revisión."}</p>
+          <p>{studies.length ? gapText(selected) : "Todavía no cargamos estudios de este río. ¿Conoces uno? Propónlo para revisión."}{studies.length > 4 && <span className="solo-escritorio"> En pantalla se muestran 4; el resto está en la lista.</span>}</p>
           <div className="basin-actions">
             <button className="button gold" type="button" onClick={() => setSelected(null)}>← Volver a la cuenca</button>
             {studies.length ? <button className="button ghost" type="button" onClick={() => showInList(selected)}>Ver en la lista ↓</button>

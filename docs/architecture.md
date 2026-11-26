@@ -6,20 +6,27 @@ La primera versión usa el App Router de Next.js con TypeScript y npm. La portad
 | --- | --- |
 | `src/app` | Rutas, interfaz y respuestas HTTP. |
 | `src/app/api/catalogo` | Catálogo público en JSON para personas y agentes. |
+| `src/app/api/fuentes` | Registro de fuentes y matriz de cifras en JSON. |
 | `src/app/api/health` | Estado del servidor, sin caché. |
 | `src/app/manifest.ts` | Manifiesto de la PWA: nombre, colores e íconos instalables. |
 | `src/lib/project.ts` | Identidad y datos públicos del proyecto. |
-| `src/lib/catalog.ts` | Catálogo semilla. La interfaz y la API usan los mismos registros públicos. |
+| `src/lib/catalog.ts` | Catálogo: 11 fichas con nivel de verificación, qué se comprobó, límites y fuentes. La interfaz y la API usan los mismos registros públicos. |
+| `src/lib/evidence.ts` | Fuentes y cifras con estado y redacción segura. Espejo de `docs/fuentes/*.csv`: `npm run datos` falla si difieren. |
+| `src/components/evidence.tsx` | Sección «Respaldo» de la portada. |
 | `src/components/basin-hero.tsx` | Portada 3D: etiquetas de estudios, líneas guía, panel del río, chips y controles accesibles. |
 | `src/components/basin-scene.ts` | Escena Three.js: relieve real, ríos, marcadores, giro automático, zoom al río y clic por *raycasting*. Se carga aparte para no frenar la portada. |
 | `src/components` | Atlas esquemático, comparación, borradores locales, guía, instalación y secciones. |
 | `public/sw.js` | Caché de la vista principal y de sus recursos públicos. |
-| `scripts/smoke.mjs` | Prueba HTTP de la portada, el estado, el catálogo, el manifiesto y el *service worker*. |
+| `scripts/validar-datos.mjs` | `npm run datos`: coherencia entre fichas, fuentes, cifras y CSV. Se ejecuta antes del lint en `npm run check`. |
+| `scripts/smoke.mjs` | Prueba HTTP de la portada, el respaldo, el estado, el catálogo, las fuentes, el manifiesto y el *service worker*. |
 | `public/geo` | `relieve.bin` (elevación en metros, Uint16), `satelite.jpg` y `rios.json`, generados por `scripts/geodatos.py`. |
+| `docs/fuentes` | Respaldo de datos: registro de fuentes, matriz de cifras, conflictos, redacción de cifras y límites. |
+| `docs/viabilidad.md` | Evaluación de viabilidad: qué está demostrado y qué no. |
 | `docs/assets` | Capturas de la aplicación usadas en el README. |
 
 ## Decisiones para la siguiente etapa
 
+- Una cifra sin fuente, alcance y estado no se publica: el CSV es la fuente única y `npm run datos` lo hace cumplir.
 - Empezar por una consulta del Beni con fuentes enlazadas. La interfaz distingue el muestreo de la publicación. Las dos observaciones del Kaka remiten a una sola revisión.
 - Mantener una proyección pública de registros revisados y autorizados que puedan consumir la web y, después, el MCP.
 - Diseñar roles, historial y retiro antes de incorporar fichas restringidas. PostgreSQL/PostGIS se evaluará cuando exista el modelo y se necesite persistencia geográfica.

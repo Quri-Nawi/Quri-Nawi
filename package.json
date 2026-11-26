@@ -12,8 +12,9 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
-    "check": "npm run lint && npm run typecheck && npm run build",
-    "smoke": "node scripts/smoke.mjs"
+    "check": "npm run datos && npm run lint && npm run typecheck && npm run build",
+    "smoke": "node scripts/smoke.mjs",
+    "datos": "node --no-warnings scripts/validar-datos.mjs"
   },
   "dependencies": {
     "next": "16.4.6",

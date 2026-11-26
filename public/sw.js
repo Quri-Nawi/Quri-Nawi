@@ -1,5 +1,5 @@
 /* global self, caches, fetch, URL, Response */
-const CACHE = "quri-nawi-public-v2";
+const CACHE = "quri-nawi-public-v4";
 const shellFiles = [
   "/manifest.webmanifest",
   "/brand/quri-nawi.png",
@@ -12,6 +12,8 @@ const shellFiles = [
   "/fonts/inter.woff2",
   "/fonts/space-grotesk.woff2",
 ];
+// Datos públicos: se consultan en línea y, sin conexión, se usa la última copia guardada.
+const dataRoutes = ["/api/catalogo", "/api/fuentes"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil((async () => {
@@ -22,6 +24,7 @@ self.addEventListener("install", (event) => {
     const chunks = [...html.matchAll(/(?:src|href)="(\/_next\/static\/[^"]+)"/g)].map((match) => match[1]);
     await cache.addAll([...new Set([...shellFiles, ...chunks])]);
     await cache.put("/", home);
+    await Promise.allSettled(dataRoutes.map((route) => cache.add(route)));
     await self.skipWaiting();
   })());
 });
@@ -40,22 +43,37 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (request.method !== "GET" || url.origin !== self.location.origin) return;
   const isHome = request.mode === "navigate" && url.pathname === "/";
-  const isAsset = url.pathname.startsWith("/_next/static/") || shellFiles.includes(url.pathname);
-  if (!isHome && !isAsset) return;
+  const isBuilt = url.pathname.startsWith("/_next/static/");
+  const isShell = shellFiles.includes(url.pathname);
+  const isData = dataRoutes.includes(url.pathname);
+  if (!isHome && !isBuilt && !isShell && !isData) return;
 
   event.respondWith((async () => {
     const cache = await caches.open(CACHE);
-    if (isAsset) {
+    const key = isHome ? "/" : request;
+    if (isBuilt) {
+      // Archivos con huella en el nombre: no cambian, se sirven del caché.
       const cached = await cache.match(request);
       if (cached) return cached;
     }
+    if (isShell) {
+      // Archivos sin huella: se sirve la copia y se renueva en segundo plano.
+      const cached = await cache.match(request);
+      if (cached) {
+        event.waitUntil(fetch(request).then((fresh) => { if (fresh.ok) return cache.put(request, fresh); }).catch(() => undefined));
+        return cached;
+      }
+    }
     try {
       const response = await fetch(request);
-      if (response.ok) await cache.put(isHome ? "/" : request, response.clone());
-      if (isHome && response.status >= 500) return (await cache.match("/")) ?? response;
+      if (response.ok) await cache.put(key, response.clone());
+      if ((isHome || isData) && response.status >= 500) return (await cache.match(key)) ?? response;
       return response;
     } catch {
-      return (await cache.match(isHome ? "/" : request)) ?? new Response("Quri-Ñawi no está disponible sin conexión.", { status: 503 });
+      const cached = await cache.match(key);
+      if (cached) return cached;
+      if (isData) return new Response(JSON.stringify({ error: "Sin conexión y sin copia guardada." }), { status: 503, headers: { "Content-Type": "application/json" } });
+      return new Response("Quri-Ñawi no está disponible sin conexión.", { status: 503 });
     }
   })());
 });

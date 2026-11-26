@@ -1,0 +1,46 @@
+{
+  "report": [
+    {
+      "width": 1440,
+      "height": 900,
+      "status": "ready",
+      "overlap": []
+    },
+    {
+      "width": 820,
+      "height": 980,
+      "status": "ready",
+      "overlap": []
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "status": "ready",
+      "overlap": []
+    },
+    {
+      "width": 360,
+      "height": 740,
+      "status": "ready",
+      "overlap": []
+    },
+    {
+      "width": 320,
+      "height": 740,
+      "status": "ready",
+      "overlap": []
+    },
+    {
+      "offlineStatus": "ready",
+      "api": {
+        "status": 200,
+        "count": 11
+      },
+      "apiSources": {
+        "status": 200,
+        "count": 52
+      }
+    }
+  ],
+  "errors": []
+}
