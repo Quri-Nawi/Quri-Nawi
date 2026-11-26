@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { areas, records, type Record as Study } from "../lib/catalog";
 import type { BasinScene, Geo } from "./basin-scene";
+import { QuriAssistant } from "./quri-assistant";
 
 const checked = ["agua", "sedimentos", "peces"];
 const studiesOf = (river: string) => records.filter((record) => record.area === river);
@@ -13,7 +14,7 @@ function gapText(river: string) {
   const missing = checked.filter((matrix) => !present.has(matrix)).map((matrix) => "de " + matrix);
   if (missing.length === 0) return "";
   const list = missing.length === 1 ? missing[0] : missing.slice(0, -1).join(", ") + " ni " + missing[missing.length - 1];
-  return `En este catálogo todavía no hay fichas ${list} para este río.`;
+  return `Faltan fichas en este catálogo ${list} para este río.`;
 }
 
 const anchors = records.flatMap((record) => record.places.map((place) => ({ id: record.id, lon: place.lon, lat: place.lat })));
@@ -122,6 +123,18 @@ export function BasinHero() {
   }, []);
 
   useEffect(() => {
+    const focusFromGuide = (event: Event) => {
+      const river = (event as CustomEvent<unknown>).detail;
+      if (typeof river === "string" && river) {
+        setSelected(river);
+        document.getElementById("inicio")?.scrollIntoView();
+      }
+    };
+    window.addEventListener("quri:focus-river", focusFromGuide);
+    return () => window.removeEventListener("quri:focus-river", focusFromGuide);
+  }, []);
+
+  useEffect(() => {
     selectedRef.current = selected;
     sceneRef.current?.focus(selected);
     const url = new URL(window.location.href);
@@ -215,9 +228,10 @@ export function BasinHero() {
           ))}
         </div>
         <div className="river-panel" role="region" aria-label={"Río " + selected}>
-          <p className="eyebrow">{studies.length ? plural(studies.length) + " en el catálogo" : "Sin fichas en el catálogo"}</p>
+          <p className="eyebrow">{studies.length ? plural(studies.length) + " en el catálogo" : "Faltan fichas en este catálogo"}</p>
           <h2>Río {selected}</h2>
-          <p>{studies.length ? gapText(selected) : "Todavía no cargamos estudios de este río. ¿Conoces uno? Propónlo para revisión."}</p>
+          <p>{studies.length ? gapText(selected) : "Faltan fichas en este catálogo para este río. ¿Conoces un estudio? Propónlo para revisión."}</p>
+          <QuriAssistant river={selected} theme="dark" />
           <div className="basin-actions">
             <button className="button gold" type="button" onClick={() => setSelected(null)}>← Volver a la cuenca</button>
             {studies.length ? <button className="button ghost" type="button" onClick={() => showInList(selected)}>Ver en la lista ↓</button>
