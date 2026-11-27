@@ -12,6 +12,9 @@ type QuriAssistantProps = {
   theme?: "dark" | "light";
   layout?: "river-panel" | "card";
   studyCount?: number;
+  extraNote?: string;
+  panelRef?: React.RefObject<HTMLDivElement | null>;
+  children?: React.ReactNode;
   onBack?: () => void;
   onShowInList?: () => void;
   onSpeakingChange?: (speaking: boolean) => void;
@@ -32,6 +35,9 @@ export function QuriAssistant({
   theme = "dark",
   layout = "card",
   studyCount,
+  extraNote,
+  panelRef,
+  children,
   onBack,
   onShowInList,
   onSpeakingChange,
@@ -341,7 +347,7 @@ export function QuriAssistant({
       : "Faltan fichas en este catálogo";
 
     return (
-      <div className="river-panel-wrap">
+      <div className="river-panel-wrap" ref={panelRef}>
         {transcriptOpen && (
           <div className="quri-sheet" role="region" aria-label={`Transcripción de Quri para el río ${script.river}`}>
             {transcriptContent}
@@ -385,7 +391,12 @@ export function QuriAssistant({
               )}
             </div>
 
-            <p className="quri-hint">{script.contextHint}</p>
+            {children}
+
+            <p className="quri-hint">
+              {script.contextHint}
+              {extraNote && <span className="solo-escritorio"> {extraNote}</span>}
+            </p>
 
             {isAudioActive && (
               <div className="quri-progress" aria-hidden="true">

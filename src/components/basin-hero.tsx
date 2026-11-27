@@ -1,12 +1,37 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { areas, records, type Record as Study } from "../lib/catalog";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { areas, records, verificationLabel, type Record as Study } from "../lib/catalog";
 import type { BasinScene, Geo } from "./basin-scene";
+import { placeLabels, type Tag } from "./label-layout";
 import { QuriAssistant } from "./quri-assistant";
+import { levelLabel, outlookYears, riverOutlook, type Level, type OutlookYear } from "../lib/outlook";
 
+// Lo que las etiquetas del mapa no deben tapar.
+const BLOCKERS = ".outlook-bar,.site-header a,.site-header button,.basin-intro h1,.basin-intro>p,.basin-intro .button,.river-chips,.basin-tools button,.basin-legend,.basin-credit,.study-label,.river-panel";
 const studiesOf = (river: string) => records.filter((record) => record.area === river);
 const plural = (count: number) => (count === 1 ? "1 ficha" : count + " fichas");
+
+const levelColor: { readonly [K in Level]: number } = { reciente: 0x6ee7a0, envejece: 0xffd36b, antiguo: 0xff8a3d, critico: 0xff3b30, "sin-datos": 0x9a93b5 };
+const yearTint: { readonly [K in OutlookYear]: number } = { 2026: 0xffffff, 2030: 0xf0d0c2, 2050: 0xdba293 };
+// Colores oficiales de los ODS de la ONU; Minamata es el convenio sobre mercurio del que Bolivia es parte.
+const goals = [
+  { id: "3", name: "Salud y bienestar", why: "exposición de las personas", color: "#4c9f38" },
+  { id: "6", name: "Agua limpia", why: "calidad del agua y sedimentos", color: "#26bde2" },
+  { id: "12", name: "Producción responsable", why: "oro sin mercurio", color: "#bf8b2e" },
+  { id: "15", name: "Vida de ecosistemas", why: "peces y ríos", color: "#56c02b" },
+] as const;
+const joinList = (items: readonly string[]) => (items.length < 2 ? items.join("") : items.slice(0, -1).join(", ") + " ni " + items[items.length - 1]);
+const ageLevel = (age: number): Level => (age <= 5 ? "reciente" : age <= 10 ? "envejece" : age <= 20 ? "antiguo" : "critico");
+
+function Goals() {
+  return (
+    <ul className="goal-chips" aria-label="Objetivos que apoya esta evidencia">
+      {goals.map((goal) => <li key={goal.id} style={{ ["--goal" as string]: goal.color }} title={goal.name + ": " + goal.why}><b>ODS {goal.id}</b>{goal.name}</li>)}
+      <li className="minamata" title="Convenio de Minamata sobre el Mercurio, del que Bolivia es parte"><b>Minamata</b>Convenio sobre el mercurio</li>
+    </ul>
+  );
+}
 
 const anchors = records.flatMap((record) => record.places.map((place) => ({ id: record.id, lon: place.lon, lat: place.lat })));
 const highlighted = new Set<string>(areas);
@@ -14,7 +39,7 @@ const highlighted = new Set<string>(areas);
 function StudyLabel({ record, setRef }: { record: Study; setRef: (node: HTMLElement | null) => void }) {
   return (
     <article className="study-label" ref={setRef}>
-      <p className="study-top"><span className={"matrix-chip matrix-" + record.matrix.split(" ")[0].toLowerCase()}>{record.matrix}</span><span>{record.review}</span></p>
+      <p className="study-top"><span className={"matrix-chip matrix-" + record.matrix.split(" ")[0].toLowerCase()}>{record.matrix}</span><span className={"verif verif-" + record.verification}>{verificationLabel[record.verification]}</span></p>
       <h3>{record.title}</h3>
       {record.observation && <p className="study-value">{record.observation.value}<small>{record.observation.unit}</small><span>{record.observation.season}</span></p>}
       <dl className="study-dates">
@@ -27,8 +52,18 @@ function StudyLabel({ record, setRef }: { record: Study; setRef: (node: HTMLElem
   );
 }
 
+// La licencia CC BY 4.0 exige este crédito, sus enlaces y avisar de los cambios hechos a la imagen.
+function ImageCredit({ short = false }: { short?: boolean }) {
+  return (
+    <>
+      <a href="https://cloudless.eox.at" target="_blank" rel="noreferrer">EOxCloudless</a> de EOX IT Services GmbH ({short ? "Copernicus Sentinel 2016" : "contiene datos Copernicus Sentinel modificados 2016"}), <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>; {short ? "modificada" : "color y sombreado modificados"}
+    </>
+  );
+}
+
 export function BasinHero() {
   const hostRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<BasinScene | null>(null);
   const linesRef = useRef<SVGSVGElement>(null);
   const tagRefs = useRef(new Map<string, HTMLElement>());
@@ -40,6 +75,17 @@ export function BasinHero() {
   const [rotating, setRotating] = useState(true);
   const [places, setPlaces] = useState<Geo["places"]>([]);
   const [riverTags, setRiverTags] = useState<{ name: string; lon: number; lat: number }[]>([]);
+  const [year, setYear] = useState<OutlookYear | null>(null);
+  const outlooks = useMemo(() => new Map(riverTags.map((river) => [river.name, riverOutlook(records, river.name, year ?? 2026)])), [riverTags, year]);
+
+  useEffect(() => {
+    if (status !== "ready") return;
+    sceneRef.current?.setOutlook(year === null ? null : {
+      colors: new Map([...outlooks].map(([name, outlook]) => [name, levelColor[outlook.level]])),
+      alerts: new Set([...outlooks].filter(([, outlook]) => outlook.level === "critico").map(([name]) => name)),
+      tint: yearTint[year],
+    });
+  }, [status, year, outlooks]);
 
   useEffect(() => {
     let disposed = false;
@@ -55,7 +101,9 @@ export function BasinHero() {
           fetch("/geo/rios.json").then((response) => { if (!response.ok) throw new Error("rios"); return response.json() as Promise<Geo>; }),
           fetch("/geo/relieve.bin").then((response) => { if (!response.ok) throw new Error("relieve"); return response.arrayBuffer(); }),
         ]);
-        const texture = await new TextureLoader().loadAsync("/geo/satelite.jpg");
+        const loader = new TextureLoader();
+        // Las normales solo añaden detalle: si fallan, el mapa se muestra sin ellas.
+        const [texture, normals] = await Promise.all([loader.loadAsync("/geo/satelite.jpg"), loader.loadAsync("/geo/normales.jpg").catch(() => null)]);
         if (disposed || !hostRef.current) return;
         setPlaces(geo.places);
         setRiverTags(geo.rivers.map((river) => {
@@ -68,18 +116,22 @@ export function BasinHero() {
           geo,
           elevation: new Uint16Array(buffer),
           texture,
+          normals,
           highlighted,
           anchors,
           reducedMotion,
           coarsePointer: window.matchMedia("(pointer: coarse)").matches,
           onPick: (river) => { if (river || selectedRef.current) setSelected(river); },
           onHover: (river, x, y) => setHover(river ? { river, x, y } : null),
+          onContextLost: () => { if (!disposed) setStatus("error"); },
           onFrame: (project) => {
-            for (const node of tagRefs.current.values()) {
-              const [kind, lon, lat] = node.dataset.at!.split("|");
-              const point = project(Number(lon), Number(lat), kind === "river" ? 0.05 : 0.02);
-              node.style.transform = `translate(${point.x.toFixed(1)}px, ${point.y.toFixed(1)}px)`;
-              node.style.opacity = point.visible ? "" : "0";
+            const hero = hostRef.current?.parentElement;
+            if (hero) {
+              const tags: Tag[] = [...tagRefs.current.values()].map((node) => {
+                const [kind, lon, lat] = node.dataset.at!.split("|");
+                return { node, ...project(Number(lon), Number(lat), kind === "river" ? 0.05 : 0.02) };
+              });
+              placeLabels(tags, hero, BLOCKERS, !reducedMotion);
             }
             const svg = linesRef.current;
             if (!svg) return;
@@ -89,6 +141,7 @@ export function BasinHero() {
               const record = records.find((item) => item.id === path.dataset.id);
               if (!label || !record) continue;
               const rect = label.getBoundingClientRect();
+              if (!rect.width) { path.removeAttribute("d"); continue; }
               const left = rect.left + rect.width / 2 < box.left + box.width / 2;
               const x0 = (left ? rect.right : rect.left) - box.left;
               const y0 = rect.top + 34 - box.top;
@@ -101,7 +154,17 @@ export function BasinHero() {
           },
         });
         setStatus("ready");
+        // En pantallas grandes se cambia a la textura nítida cuando llega; si falla, queda la ligera.
+        const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
+        if (!saveData && window.matchMedia("(min-width: 761px) and (pointer: fine)").matches) {
+          loader.loadAsync("/geo/satelite-hd.jpg").then((sharp) => {
+            if (disposed) sharp.dispose(); else sceneRef.current?.setTexture(sharp);
+          }).catch(() => undefined);
+        }
         if (shared && geo.rivers.some((river) => river.name === shared)) setSelected(shared);
+        // /?escenario=2050 abre la portada en ese año del escenario, para presentarlo directamente.
+        const scenario = outlookYears.find((option) => String(option) === new URLSearchParams(window.location.search).get("escenario"));
+        if (scenario) setYear(scenario);
       } catch {
         if (!disposed) setStatus("error");
       }
@@ -138,6 +201,17 @@ export function BasinHero() {
     return () => window.removeEventListener("keydown", close);
   }, [selected]);
 
+  useEffect(() => {
+    const panel = panelRef.current;
+    const hero = panel?.closest<HTMLElement>(".basin-hero");
+    if (!panel || !hero) return;
+    const resize = new ResizeObserver(() => {
+      hero.style.setProperty("--river-panel-height", `${panel.getBoundingClientRect().height}px`);
+    });
+    resize.observe(panel);
+    return () => resize.disconnect();
+  }, [selected]);
+
   function toggleRotation() {
     sceneRef.current?.setRotation(!rotating);
     setRotating(!rotating);
@@ -165,8 +239,9 @@ export function BasinHero() {
       {status === "ready" && <div className="basin-tags" aria-hidden="true">
         {places.map((place) => <span key={place.name} className="place-tag" ref={tag("place", place.name, place.lon, place.lat)}>{place.name}</span>)}
         {riverTags.filter((river) => !selected || river.name === selected).map((river) => (
-          <span key={river.name} className={"river-tag" + (highlighted.has(river.name) ? " has-studies" : "")} ref={tag("river", river.name, river.lon, river.lat)}>
-            Río {river.name}{highlighted.has(river.name) ? <b>{studiesOf(river.name).length}</b> : null}
+          <span key={river.name} className={"river-tag" + (year !== null ? " level-" + outlooks.get(river.name)?.level : "") + (highlighted.has(river.name) ? " has-studies" : "") + (selected === river.name ? " is-selected" : "")} ref={tag("river", river.name, river.lon, river.lat)}>
+            Río {river.name}{year === null && highlighted.has(river.name) ? <b>{studiesOf(river.name).length}</b> : null}
+            {year !== null && <em className="age">{outlooks.get(river.name)?.newest ? outlooks.get(river.name)?.newest + " · " + outlooks.get(river.name)?.age + " años" : "sin datos"}</em>}
           </span>
         ))}
       </div>}
@@ -175,13 +250,34 @@ export function BasinHero() {
         <strong>Río {hover.river}</strong>{studiesOf(hover.river).length ? plural(studiesOf(hover.river).length) + " · clic para acercar" : "Sin fichas en el catálogo · clic para ver"}
       </p>}
 
-      <div className="basin-intro">
-        <p className="eyebrow">Cuenca del Beni · Bolivia</p>
-        <h1 id="hero-title">Explora un río.<br /><em>Comprueba qué se sabe del mercurio.</em></h1>
-        <p>Toca un río dorado para acercarte y ver sus estudios, con la fuente, la fecha de muestreo y lo que falta saber.</p>
+      <div className="outlook-bar" role="group" aria-label="Escenario: si nadie vuelve a medir">
+        <span>Si nadie vuelve a medir</span>
+        {outlookYears.map((option) => (
+          <button key={option} type="button" aria-pressed={year === option} onClick={() => setYear(year === option ? null : option)} disabled={status !== "ready"}>{option === 2026 ? "Hoy" : option}</button>
+        ))}
+      </div>
+
+      <div className={"basin-intro" + (year !== null ? " is-outlook" : "")}>
+        {year === null ? <>
+          <p className="eyebrow">Cuenca del Beni · Bolivia</p>
+          <h1 id="hero-title">Explora un río.<br /><em>Comprueba qué se sabe del mercurio.</em></h1>
+          <p>Toca un río dorado para acercarte y ver sus estudios, con la fuente, la fecha de muestreo y lo que falta saber.</p>
+        </> : <>
+          <p className="eyebrow">{year === 2026 ? "Hoy" : "Escenario " + year} · si nadie vuelve a medir</p>
+          <h1 id="hero-title">{year === 2026 ? "Hoy, el último dato del Kaka tiene" : "En " + year + ", el último dato del Kaka tendría"} <em>{outlooks.get("Kaka")?.age} años.</em></h1>
+          <p>El color de cada río muestra la antigüedad de su medición de mercurio más reciente en este catálogo. No proyecta contaminación: muestra dónde la evidencia envejece y qué conviene medir primero.</p>
+          <ol className="priority-list" aria-label="Dónde medir primero">
+            {[...areas].sort((a, b) => (outlooks.get(b)?.age ?? 999) - (outlooks.get(a)?.age ?? 999)).map((river) => {
+              const outlook = outlooks.get(river);
+              return <li key={river} className={"level-" + outlook?.level}><strong>Río {river}</strong>{outlook?.newest ? "último dato " + outlook.newest + " · " + outlook.age + " años" : "sin datos"}{outlook?.missing.length ? <small>Falta: {joinList(outlook.missing)}</small> : null}</li>;
+            })}
+          </ol>
+          <Goals />
+        </>}
         <div className="basin-actions">
           <button className="button gold" type="button" onClick={() => setSelected("Kaka")} disabled={status !== "ready"}>Ver el río Kaka <span aria-hidden="true">↗</span></button>
-          <a className="button ghost" href="#explorar">Vista 2D y lista <span aria-hidden="true">↓</span></a>
+          {year === null ? <a className="button ghost" href="#explorar">Vista 2D y lista <span aria-hidden="true">↓</span></a>
+            : <button className="button ghost" type="button" onClick={() => setYear(null)}>Volver al mapa de evidencia</button>}
         </div>
       </div>
 
@@ -200,11 +296,18 @@ export function BasinHero() {
       </div>
 
       <aside className="basin-legend" aria-label="Leyenda del mapa">
-        <p><i className="legend-gold" />Río con fichas</p>
-        <p><i className="legend-blue" />Río sin fichas todavía</p>
-        <p><i className="legend-pin" />Lugar aproximado de un estudio</p>
-        <small>Relieve real exagerado ×11. Ríos © colaboradores de OpenStreetMap · Relieve: Mapzen/AWS (SRTM) · Imagen: NASA Blue Marble.</small>
+        {year === null ? <>
+          <p><i className="legend-gold" />Río con fichas</p>
+          <p><i className="legend-blue" />Río sin fichas todavía</p>
+          <p><i className="legend-pin" />Lugar aproximado de un estudio</p>
+        </> : <>
+          <p className="legend-title">Antigüedad del dato más reciente en {year}</p>
+          {(Object.keys(levelLabel) as Level[]).map((level) => <p key={level}><i className={"legend-level level-" + level} />{levelLabel[level]}</p>)}
+          <p className="legend-note">Criterio del equipo para priorizar dónde medir; no es un umbral científico.</p>
+        </>}
+        <small>Relieve real exagerado ×11. Ríos © colaboradores de OpenStreetMap · Relieve: Mapzen/AWS (SRTM) · Imagen: <ImageCredit /> · Tono: NASA Blue Marble.</small>
       </aside>
+      <p className="basin-credit">Imagen: <ImageCredit short /></p>
 
       {selected && <>
         <svg className="basin-lines" ref={linesRef} aria-hidden="true">
@@ -224,10 +327,18 @@ export function BasinHero() {
           river={selected}
           theme="dark"
           studyCount={studies.length}
+          panelRef={panelRef}
+          extraNote={studies.length > 4 ? "En pantalla se muestran 4; el resto está en la lista." : undefined}
           onBack={() => setSelected(null)}
           onShowInList={() => showInList(selected)}
           onSpeakingChange={(speaking) => sceneRef.current?.setNarrating(speaking)}
-        />
+        >
+          {year !== null && <ul className="outlook-lines" aria-label={"Antigüedad de los datos en " + year}>
+            {outlooks.get(selected)?.latest.map((line) => <li key={line.key} className={"level-" + (line.year === null ? "sin-datos" : ageLevel(year - line.year))}>
+              <span>{line.label}</span><strong>{line.year === null ? "sin dato" : line.year + " · " + (year - line.year) + " años"}</strong><small>ODS {line.ods.join(" · ")}</small>
+            </li>)}
+          </ul>}
+        </QuriAssistant>
       </>}
     </section>
   );

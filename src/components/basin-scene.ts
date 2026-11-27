@@ -15,6 +15,7 @@ export type SceneOptions = {
   geo: Geo;
   elevation: Uint16Array;
   texture: THREE.Texture;
+  normals: THREE.Texture | null;
   highlighted: ReadonlySet<string>;
   anchors: readonly Anchor[];
   reducedMotion: boolean;
@@ -22,6 +23,7 @@ export type SceneOptions = {
   onPick: (river: string | null) => void;
   onHover: (river: string | null, x: number, y: number) => void;
   onFrame: (project: (lon: number, lat: number, lift?: number) => { x: number; y: number; visible: boolean }) => void;
+  onContextLost?: () => void;
 };
 
 export type BasinScene = {
@@ -29,14 +31,35 @@ export type BasinScene = {
   zoom: (factor: number) => void;
   setRotation: (on: boolean) => void;
   setNarrating: (on: boolean) => void;
+  setTexture: (texture: THREE.Texture) => void;
+  /** Escenario «si nadie vuelve a medir»: color por río, alertas pulsantes y tono del terreno; null vuelve al mapa normal. */
+  setOutlook: (outlook: { colors: ReadonlyMap<string, number>; alerts: ReadonlySet<string>; tint: number } | null) => void;
   dispose: () => void;
 };
 
 const EXAGGERATION = 11 / 111_000; // unidades del mundo por metro: 1 unidad = 1° de latitud ≈ 111 km
 const BASE = -0.16;
-const OVERVIEW = { distance: 9, polar: 0.98 };
+const RIVER_LIFT = 0.017; // altura de los ríos sobre la malla para que las laderas no los tapen
+// Vista general desde el noreste: la llanura y los ríos delante, la cordillera al fondo.
+const OVERVIEW = { distance: 9.9, polar: 0.94, azimuth: 2.45 };
 
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+
+// Vetas horizontales para los costados del bloque, como el corte de una maqueta.
+function strataTexture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 4;
+  canvas.height = 256;
+  const ctx = canvas.getContext("2d")!;
+  const gradient = ctx.createLinearGradient(0, 256, 0, 0);
+  const stops: [number, string][] = [[0, "#150f0a"], [0.2, "#2c1f13"], [0.22, "#1d150e"], [0.38, "#3d2a18"], [0.4, "#2b1e12"], [0.6, "#5a3e22"], [0.62, "#432f1b"], [1, "#7a5833"]];
+  for (const [at, color] of stops) gradient.addColorStop(at, color);
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 4, 256);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
 
 function dotTexture() {
   const canvas = document.createElement("canvas");
@@ -52,7 +75,8 @@ function dotTexture() {
 }
 
 export function createBasinScene(options: SceneOptions): BasinScene {
-  const { host, geo, elevation, texture, highlighted } = options;
+  const { host, geo, elevation, normals, highlighted } = options;
+  let texture = options.texture;
   const { west, east, south, north, width: W, height: H } = geo.bounds;
   const latC = (north + south) / 2;
   const lonC = (west + east) / 2;
@@ -94,18 +118,23 @@ export function createBasinScene(options: SceneOptions): BasinScene {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.25;
+  renderer.toneMapping = THREE.NeutralToneMapping;
+  renderer.toneMappingExposure = 1.12;
   renderer.domElement.setAttribute("aria-hidden", "true");
   host.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(36, 1, 0.01, 100);
 
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-  const ground = new THREE.Mesh(terrain, new THREE.MeshStandardMaterial({ map: texture, roughness: 1, metalness: 0 }));
-  scene.add(ground);
+  const prepare = (map: THREE.Texture) => {
+    map.colorSpace = THREE.SRGBColorSpace;
+    map.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    return map;
+  };
+  if (normals) normals.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  // Las normales se calcularon con el relieve de alta resolución: dan detalle sin añadir triángulos.
+  const groundMaterial = new THREE.MeshStandardMaterial({ map: prepare(texture), normalMap: normals, normalMapType: THREE.ObjectSpaceNormalMap, roughness: 0.94, metalness: 0 });
+  scene.add(new THREE.Mesh(terrain, groundMaterial));
 
   // Paredes del bloque, como una maqueta sobre la mesa.
   const wall: number[] = [];
@@ -123,7 +152,11 @@ export function createBasinScene(options: SceneOptions): BasinScene {
   const wallGeometry = new THREE.BufferGeometry();
   wallGeometry.setAttribute("position", new THREE.Float32BufferAttribute(wall, 3));
   wallGeometry.computeVertexNormals();
-  scene.add(new THREE.Mesh(wallGeometry, new THREE.MeshStandardMaterial({ color: 0x3a2d1f, roughness: 1, side: THREE.DoubleSide })));
+  const wallUvs: number[] = [];
+  for (let k = 0; k < wall.length; k += 3) wallUvs.push(0, Math.min((wall[k + 1] - BASE) / 0.45, 1));
+  wallGeometry.setAttribute("uv", new THREE.Float32BufferAttribute(wallUvs, 2));
+  const strata = strataTexture();
+  scene.add(new THREE.Mesh(wallGeometry, new THREE.MeshStandardMaterial({ map: strata, roughness: 1, side: THREE.DoubleSide })));
 
   const dot = dotTexture();
   const shadow = new THREE.Mesh(
@@ -134,10 +167,13 @@ export function createBasinScene(options: SceneOptions): BasinScene {
   shadow.position.y = BASE - 0.02;
   scene.add(shadow);
 
-  scene.add(new THREE.HemisphereLight(0xe8f3ff, 0x24301f, 1.7));
-  const sun = new THREE.DirectionalLight(0xfff0d2, 2.6);
-  sun.position.set(-3, 5, -4);
-  scene.add(sun);
+  scene.add(new THREE.HemisphereLight(0xd6ecff, 0x46563a, 2.05));
+  // Sol del noroeste, la misma dirección que las sombras horneadas en la textura.
+  const sun = new THREE.DirectionalLight(0xffe7bd, 3.1);
+  sun.position.set(-4, 3.2, -4);
+  const fill = new THREE.DirectionalLight(0xaed0ff, 0.9);
+  fill.position.set(4, 3, -1);
+  scene.add(sun, fill);
 
   // Frontera de Bolivia.
   const borderMaterial = new THREE.LineDashedMaterial({ color: 0xf3e2a6, dashSize: 0.05, gapSize: 0.035, transparent: true, opacity: 0.55 });
@@ -162,14 +198,14 @@ export function createBasinScene(options: SceneOptions): BasinScene {
       for (let k = 0; k < segment.length - 1; k++) {
         const [a0, a1] = segment[k], [b0, b1] = segment[k + 1];
         const steps = Math.max(1, Math.ceil(Math.hypot((b0 - a0) * kx, b1 - a1) / 0.012));
-        for (let s = 0; s < steps; s++) points.push(world(a0 + ((b0 - a0) * s) / steps, a1 + ((b1 - a1) * s) / steps, 0.012));
+        for (let s = 0; s < steps; s++) points.push(world(a0 + ((b0 - a0) * s) / steps, a1 + ((b1 - a1) * s) / steps, RIVER_LIFT));
       }
       const [lastLon, lastLat] = segment[segment.length - 1];
-      points.push(world(lastLon, lastLat, 0.012));
+      points.push(world(lastLon, lastLat, RIVER_LIFT));
       const curve = new THREE.CatmullRomCurve3(points);
       const detail = Math.min(points.length * 2, 1600);
       scene.add(new THREE.Mesh(new THREE.TubeGeometry(curve, detail, featured ? 0.0075 : 0.0055, 6), core));
-      scene.add(new THREE.Mesh(new THREE.TubeGeometry(curve, detail, featured ? 0.02 : 0.014, 6), glow));
+      scene.add(new THREE.Mesh(new THREE.TubeGeometry(curve, detail, featured ? 0.017 : 0.012, 6), glow));
       const hit = new THREE.Mesh(new THREE.TubeGeometry(curve, Math.min(points.length, 500), 0.055, 5), hitMaterial);
       hit.userData.river = river.name;
       hits.push(hit);
@@ -178,6 +214,18 @@ export function createBasinScene(options: SceneOptions): BasinScene {
       points.forEach((point) => entry.box.expandByPoint(point));
     }
     rivers.set(river.name, entry);
+  }
+
+  // Anillos de alerta del escenario, ocultos en el mapa normal.
+  const alerts = new Map<string, THREE.Mesh>();
+  for (const river of rivers.values()) {
+    const longest = river.curves.reduce((a, b) => (b.points.length > a.points.length ? b : a));
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.05, 0.065, 48), new THREE.MeshBasicMaterial({ color: 0xff3b30, transparent: true, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending }));
+    ring.rotateX(-Math.PI / 2);
+    ring.position.copy(longest.getPointAt(0.55));
+    ring.visible = false;
+    scene.add(ring);
+    alerts.set(river.name, ring);
   }
 
   // Corriente de luz sobre los ríos que ya tienen fichas.
@@ -250,9 +298,9 @@ export function createBasinScene(options: SceneOptions): BasinScene {
 
   type Tween = { from: THREE.Vector3; to: THREE.Vector3; fromTarget: THREE.Vector3; toTarget: THREE.Vector3; start: number; duration: number };
   let tween: Tween | null = null;
-  const flyTo = (target: THREE.Vector3, distance: number, polar: number, duration = 1600) => {
+  const flyTo = (target: THREE.Vector3, distance: number, polar: number, duration = 1600, heading?: number) => {
     const offset = camera.position.clone().sub(controls.target);
-    const azimuth = Math.atan2(offset.x, offset.z);
+    const azimuth = heading ?? Math.atan2(offset.x, offset.z);
     const to = spherical(distance, polar, azimuth, target);
     if (options.reducedMotion || duration === 0) {
       camera.position.copy(to);
@@ -264,9 +312,9 @@ export function createBasinScene(options: SceneOptions): BasinScene {
   };
 
   // Entrada: de una vista cenital a la maqueta inclinada.
-  camera.position.copy(spherical(12, 0.12, 0.4, home));
+  camera.position.copy(spherical(12, 0.12, OVERVIEW.azimuth - 0.5, home));
   controls.target.copy(home);
-  flyTo(home, OVERVIEW.distance, OVERVIEW.polar, 2600);
+  flyTo(home, OVERVIEW.distance, OVERVIEW.polar, 2600, OVERVIEW.azimuth);
   controls.autoRotate = false;
   const introDone = window.setTimeout(syncAutoRotate, options.reducedMotion ? 0 : 2600);
 
@@ -313,7 +361,7 @@ export function createBasinScene(options: SceneOptions): BasinScene {
   const shiftGoal = () => {
     const portrait = camera.aspect < 0.8;
     if (focused) return portrait ? { x: 0, y: 0.26 } : { x: 0, y: 0.06 };
-    return portrait ? { x: 0, y: 0.2 } : { x: -0.15, y: 0.02 };
+    return portrait ? { x: 0, y: 0.13 } : { x: -0.15, y: 0.03 };
   };
   const applyShift = () => {
     const { width, height } = host.getBoundingClientRect();
@@ -346,6 +394,13 @@ export function createBasinScene(options: SceneOptions): BasinScene {
   const clock = new THREE.Clock();
   const flowPositions = flowGeometry.attributes.position as THREE.BufferAttribute;
   let frame = 0;
+  // Si el navegador pierde el contexto WebGL (poca memoria, cambio de GPU), se detiene el dibujo y se avisa.
+  const onContextLost = (event: Event) => {
+    event.preventDefault();
+    cancelAnimationFrame(frame);
+    options.onContextLost?.();
+  };
+  renderer.domElement.addEventListener("webglcontextlost", onContextLost);
   const loop = () => {
     frame = requestAnimationFrame(loop);
     const delta = Math.min(clock.getDelta(), 0.1);
@@ -373,6 +428,12 @@ export function createBasinScene(options: SceneOptions): BasinScene {
       });
       flowPositions.needsUpdate = true;
       const time = performance.now() / 1000;
+      for (const ring of alerts.values()) {
+        if (!ring.visible) continue;
+        const phase = (time * 0.6) % 1;
+        ring.scale.setScalar(1 + phase * 3);
+        (ring.material as THREE.MeshBasicMaterial).opacity = focused ? 0 : 0.95 * (1 - phase); // al acercarse a un río, el panel ya muestra la antigüedad
+      }
       for (const pin of pins) {
         const phase = (time * 0.8 + pin.phase) % 1;
         pin.ring.scale.setScalar(1 + phase * 2.4);
@@ -399,12 +460,33 @@ export function createBasinScene(options: SceneOptions): BasinScene {
       const box = rivers.get(focused)!.box;
       const center = box.getCenter(new THREE.Vector3());
       const size = box.getSize(new THREE.Vector3());
-      flyTo(center, Math.min(Math.max(Math.hypot(size.x, size.z) * 1.3, 1.9), 7.5), 0.86);
+      // Más cenital que la vista general: así las cordilleras no ocultan el cauce.
+      flyTo(center, Math.min(Math.max(Math.hypot(size.x, size.z) * 1.3, 1.9), 7.5), 0.62);
     },
     zoom(factor) {
       const offset = camera.position.clone().sub(controls.target);
       const distance = Math.min(Math.max(offset.length() * factor, controls.minDistance), controls.maxDistance);
       flyTo(controls.target.clone(), distance, new THREE.Spherical().setFromVector3(offset).phi, 450);
+    },
+    setTexture(next) {
+      const image = next.image as { width: number; height: number };
+      if (Math.max(image.width, image.height) > renderer.capabilities.maxTextureSize) { next.dispose(); return; }
+      // Se sube a la GPU antes de cambiarla para que no haya un salto al dibujar.
+      renderer.initTexture(prepare(next));
+      groundMaterial.map = next;
+      groundMaterial.needsUpdate = true;
+      texture.dispose();
+      texture = next;
+    },
+    setOutlook(outlook) {
+      for (const river of rivers.values()) {
+        const color = outlook?.colors.get(river.name);
+        river.core.color.setHex(color ?? (river.featured ? 0xffd36b : 0x8fdcff));
+        river.glow.color.setHex(color ?? (river.featured ? 0xffb938 : 0x58c4ff));
+        alerts.get(river.name)!.visible = Boolean(outlook?.alerts.has(river.name));
+      }
+      groundMaterial.color.setHex(outlook?.tint ?? 0xffffff);
+      flow.visible = !outlook; // la corriente dorada significa «tiene fichas»; en el escenario manda el color por antigüedad
     },
     setRotation(on) {
       rotating = on && !options.reducedMotion;
@@ -422,6 +504,7 @@ export function createBasinScene(options: SceneOptions): BasinScene {
       resizer.disconnect();
       watcher.disconnect();
       controls.dispose();
+      renderer.domElement.removeEventListener("webglcontextlost", onContextLost);
       renderer.domElement.removeEventListener("pointerdown", onDown);
       renderer.domElement.removeEventListener("pointerup", onUp);
       renderer.domElement.removeEventListener("pointermove", onMove);
@@ -433,6 +516,8 @@ export function createBasinScene(options: SceneOptions): BasinScene {
         (Array.isArray(material) ? material : material ? [material] : []).forEach((item) => item.dispose());
       });
       texture.dispose();
+      normals?.dispose();
+      strata.dispose();
       dot.dispose();
       renderer.dispose();
       renderer.domElement.remove();

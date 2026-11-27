@@ -21,15 +21,15 @@ export function ProjectSections() {
         <section className="agent-panel anchor-section" id="agentes" aria-labelledby="agent-title">
           <p className="eyebrow">Agentes e interoperabilidad</p>
           <h2 id="agent-title">El mismo catálogo, en JSON.</h2>
-          <p>Consulta los registros públicos y sus fuentes. El MCP de Ale es la referencia para una futura conexión de agentes.</p>
-          <a className="button outline" href="/api/catalogo" target="_blank" rel="noreferrer">Abrir catálogo JSON ↗</a>
+          <p>Consulta los registros públicos y sus fuentes. El MCP de Jhamil es un servicio separado. La conexión con este catálogo requiere conservar los mismos identificadores, fuentes y estados.</p>
+          <div className="basin-actions"><a className="button outline" href="/api/catalogo" target="_blank" rel="noreferrer">Abrir catálogo JSON ↗</a><a className="button outline" href="/api/fuentes" target="_blank" rel="noreferrer">Fuentes y cifras JSON ↗</a></div>
         </section>
       </div>
     </div>
     <section className="section-inner method anchor-section" id="escala" aria-labelledby="scale-title">
       <div className="section-head"><div><p className="eyebrow">Escala</p><h2 id="scale-title">Del piloto a más cuencas.</h2></div><p>La expansión depende de fichas comprobables, permisos y un flujo de revisión que otra institución pueda usar.</p></div>
       <ol className="method-list">
-        <li><h3>Beni y Kaka</h3><p>Probar con usuarios si encuentran la fuente y pueden explicar qué dato falta.</p></li>
+        <li><h3>Beni y Kaka</h3><p>Probar con usuarios si encuentran la fuente y pueden explicar qué dato falta. Aún no hay prueba con usuarios: es el primer paso del plan (docs/viabilidad.md).</p></li>
         <li><h3>Revisión institucional</h3><p>Asignar revisores, registrar el historial y definir quién publica y quién mantiene el catálogo.</p></li>
         <li><h3>Nuevos territorios</h3><p>Incorporar estudios de otras cuencas y permitir que los agentes lean las fichas autorizadas.</p></li>
       </ol>
