@@ -52,6 +52,9 @@ const basin = await geo.json();
 assert.ok(dataset.records.every(({ area }) => basin.rivers.some(({ name }) => name === area)), "cada territorio del catálogo tiene su río en el mapa 3D");
 const relief = await fetch(new URL("/geo/relieve.bin", origin), options);
 assert.equal((await relief.arrayBuffer()).byteLength, basin.bounds.width * basin.bounds.height * 2);
-const satellite = await fetch(new URL("/geo/satelite.jpg", origin), options);
-assert.equal(satellite.status, 200);
+for (const name of ["satelite.jpg", "satelite-hd.jpg", "normales.jpg"]) {
+  const image = await fetch(new URL("/geo/" + name, origin), options);
+  assert.equal(image.status, 200, name);
+  assert.match(image.headers.get("content-type") ?? "", /image\/jpeg/, name);
+}
 console.log("Portada, respaldo, API de catálogo y fuentes, ruta de estado, PWA y datos de la cuenca 3D verificados.");

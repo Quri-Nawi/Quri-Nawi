@@ -3,8 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { areas, records, verificationLabel, type Record as Study } from "../lib/catalog";
 import type { BasinScene, Geo } from "./basin-scene";
+import { placeLabels, type Tag } from "./label-layout";
 
 const checked = ["agua", "sedimentos", "peces"];
+// Lo que las etiquetas del mapa no deben tapar.
+const BLOCKERS = ".site-header a,.site-header button,.basin-intro h1,.basin-intro>p,.basin-intro .button,.river-chips,.basin-tools button,.basin-legend,.basin-credit,.study-label,.river-panel";
 const studiesOf = (river: string) => records.filter((record) => record.area === river);
 const plural = (count: number) => (count === 1 ? "1 ficha" : count + " fichas");
 
@@ -32,6 +35,15 @@ function StudyLabel({ record, setRef }: { record: Study; setRef: (node: HTMLElem
       <p className="study-precision">{record.precision}</p>
       <a href={record.url} target="_blank" rel="noreferrer">{record.source} ↗</a>
     </article>
+  );
+}
+
+// La licencia CC BY 4.0 exige este crédito, sus enlaces y avisar de los cambios hechos a la imagen.
+function ImageCredit({ short = false }: { short?: boolean }) {
+  return (
+    <>
+      <a href="https://cloudless.eox.at" target="_blank" rel="noreferrer">EOxCloudless</a> de EOX IT Services GmbH ({short ? "Copernicus Sentinel 2016" : "contiene datos Copernicus Sentinel modificados 2016"}), <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>; {short ? "modificada" : "color y sombreado modificados"}
+    </>
   );
 }
 
@@ -64,7 +76,9 @@ export function BasinHero() {
           fetch("/geo/rios.json").then((response) => { if (!response.ok) throw new Error("rios"); return response.json() as Promise<Geo>; }),
           fetch("/geo/relieve.bin").then((response) => { if (!response.ok) throw new Error("relieve"); return response.arrayBuffer(); }),
         ]);
-        const texture = await new TextureLoader().loadAsync("/geo/satelite.jpg");
+        const loader = new TextureLoader();
+        // Las normales solo añaden detalle: si fallan, el mapa se muestra sin ellas.
+        const [texture, normals] = await Promise.all([loader.loadAsync("/geo/satelite.jpg"), loader.loadAsync("/geo/normales.jpg").catch(() => null)]);
         if (disposed || !hostRef.current) return;
         setPlaces(geo.places);
         setRiverTags(geo.rivers.map((river) => {
@@ -77,6 +91,7 @@ export function BasinHero() {
           geo,
           elevation: new Uint16Array(buffer),
           texture,
+          normals,
           highlighted,
           anchors,
           reducedMotion,
@@ -85,11 +100,13 @@ export function BasinHero() {
           onHover: (river, x, y) => setHover(river ? { river, x, y } : null),
           onContextLost: () => { if (!disposed) setStatus("error"); },
           onFrame: (project) => {
-            for (const node of tagRefs.current.values()) {
-              const [kind, lon, lat] = node.dataset.at!.split("|");
-              const point = project(Number(lon), Number(lat), kind === "river" ? 0.05 : 0.02);
-              node.style.transform = `translate(${point.x.toFixed(1)}px, ${point.y.toFixed(1)}px)`;
-              node.style.opacity = point.visible ? "" : "0";
+            const hero = hostRef.current?.parentElement;
+            if (hero) {
+              const tags: Tag[] = [...tagRefs.current.values()].map((node) => {
+                const [kind, lon, lat] = node.dataset.at!.split("|");
+                return { node, ...project(Number(lon), Number(lat), kind === "river" ? 0.05 : 0.02) };
+              });
+              placeLabels(tags, hero, BLOCKERS, !reducedMotion);
             }
             const svg = linesRef.current;
             if (!svg) return;
@@ -112,6 +129,13 @@ export function BasinHero() {
           },
         });
         setStatus("ready");
+        // En pantallas grandes se cambia a la textura nítida cuando llega; si falla, queda la ligera.
+        const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
+        if (!saveData && window.matchMedia("(min-width: 761px) and (pointer: fine)").matches) {
+          loader.loadAsync("/geo/satelite-hd.jpg").then((sharp) => {
+            if (disposed) sharp.dispose(); else sceneRef.current?.setTexture(sharp);
+          }).catch(() => undefined);
+        }
         if (shared && geo.rivers.some((river) => river.name === shared)) setSelected(shared);
       } catch {
         if (!disposed) setStatus("error");
@@ -174,7 +198,7 @@ export function BasinHero() {
       {status === "ready" && <div className="basin-tags" aria-hidden="true">
         {places.map((place) => <span key={place.name} className="place-tag" ref={tag("place", place.name, place.lon, place.lat)}>{place.name}</span>)}
         {riverTags.filter((river) => !selected || river.name === selected).map((river) => (
-          <span key={river.name} className={"river-tag" + (highlighted.has(river.name) ? " has-studies" : "")} ref={tag("river", river.name, river.lon, river.lat)}>
+          <span key={river.name} className={"river-tag" + (highlighted.has(river.name) ? " has-studies" : "") + (selected === river.name ? " is-selected" : "")} ref={tag("river", river.name, river.lon, river.lat)}>
             Río {river.name}{highlighted.has(river.name) ? <b>{studiesOf(river.name).length}</b> : null}
           </span>
         ))}
@@ -212,8 +236,9 @@ export function BasinHero() {
         <p><i className="legend-gold" />Río con fichas</p>
         <p><i className="legend-blue" />Río sin fichas todavía</p>
         <p><i className="legend-pin" />Lugar aproximado de un estudio</p>
-        <small>Relieve real exagerado ×11. Ríos © colaboradores de OpenStreetMap · Relieve: Mapzen/AWS (SRTM) · Imagen: NASA Blue Marble.</small>
+        <small>Relieve real exagerado ×11. Ríos © colaboradores de OpenStreetMap · Relieve: Mapzen/AWS (SRTM) · Imagen: <ImageCredit /> · Tono: NASA Blue Marble.</small>
       </aside>
+      <p className="basin-credit">Imagen: <ImageCredit short /></p>
 
       {selected && <>
         <svg className="basin-lines" ref={linesRef} aria-hidden="true">

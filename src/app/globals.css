@@ -149,17 +149,18 @@ dialog p{font-size:14px;margin:9px 0}
 .basin-canvas{position:absolute;inset:0}
 .basin-canvas canvas{display:block;width:100%;height:100%;opacity:0;transition:opacity 1.4s ease}
 .basin-hero[data-status=ready] .basin-canvas canvas{opacity:1}
-.basin-scrim{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,#06120d99 0,#06120d00 20%,#06120d00 55%,#06120dd9 100%)}
+.basin-scrim{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#06120dd9 0,#06120d80 24%,#06120d00 46%),linear-gradient(180deg,#06120d99 0,#06120d00 18%,#06120d00 72%,#06120da6 100%)}
+.is-focused .basin-scrim{background:linear-gradient(180deg,#06120d99 0,#06120d00 18%,#06120d00 70%,#06120d80 100%)}
 .basin-status{position:absolute;z-index:2;top:50%;left:50%;transform:translate(-50%,-50%);padding:10px 16px;border-radius:999px;background:#0b211acc;border:1px solid #ffffff2a;font-size:13px;text-align:center}
 .basin-status a{color:#ffd36b;text-decoration:underline}
 .basin-tags{position:absolute;inset:0;z-index:1;pointer-events:none}
 .place-tag,.river-tag{position:absolute;left:0;top:0;white-space:nowrap;will-change:transform;transition:opacity .3s}
-.place-tag{margin:-7px 0 0 8px;font-size:10px;font-weight:750;letter-spacing:.08em;text-transform:uppercase;color:#f6f1dcd9;text-shadow:0 1px 3px #000,0 0 8px #000}
-.place-tag:before{content:"";position:absolute;left:-8px;top:5px;width:5px;height:5px;border-radius:50%;background:#fff6dd;box-shadow:0 0 6px #fff6dd}
+.place-tag{margin:-9px 0 0 8px;padding:2px 6px;border-radius:5px;background:#071a15cc;font-size:11px;line-height:1.3;font-weight:750;letter-spacing:.08em;text-transform:uppercase;color:#f6f1dcd9;text-shadow:0 1px 3px #000,0 0 8px #000}
+.place-tag.flip:before{left:auto;right:-8px}
+.place-tag:before{content:"";position:absolute;left:-8px;top:6px;width:5px;height:5px;border-radius:50%;background:#fff6dd;box-shadow:0 0 6px #fff6dd}
 .river-tag{display:inline-flex;align-items:center;gap:6px;margin:-30px 0 0 -34px;padding:5px 9px;border-radius:999px;font:700 12px/1 var(--display);color:#c9efff;background:#071a15cc;border:1px solid #8fdcff59;backdrop-filter:blur(4px)}
 .river-tag.has-studies{color:#ffe7ab;border-color:#ffd36b99}
 .river-tag b{padding:2px 6px;border-radius:999px;background:#ffd36b;color:#1b2b1f;font-size:10px}
-.is-focused .place-tag{opacity:.6}
 .river-hover{position:absolute;left:0;top:0;z-index:4;pointer-events:none;display:grid;gap:3px;padding:8px 11px;border-radius:7px;background:#0b211af0;border:1px solid #ffd36b66;font-size:11px;color:#dbe8dc;box-shadow:0 8px 24px #0007}
 .river-hover strong{font:700 15px/1.1 var(--display);color:#fff4d2}
 .basin-intro{position:absolute;z-index:2;left:var(--edge);bottom:96px;max-width:500px;transition:opacity .45s,transform .45s,visibility .45s}
@@ -181,13 +182,15 @@ dialog p{font-size:14px;margin:9px 0}
 .basin-tools{position:absolute;z-index:3;right:calc(var(--edge) - 20px);top:50%;translate:0 -50%;display:grid;gap:7px}
 .basin-tools button{width:40px;height:40px;border-radius:50%;border:1px solid #ffffff40;background:#0b211acc;color:#fff6dd;font-size:17px;line-height:1;backdrop-filter:blur(6px)}
 .basin-tools button:hover,.basin-tools button[aria-pressed=true]{background:#ffd36b;color:#1b2b1f}
-.basin-legend{position:absolute;z-index:2;right:var(--edge);bottom:26px;display:grid;gap:4px;max-width:270px;padding:10px 12px;border-radius:9px;background:#0b211abf;border:1px solid #ffffff1f;font-size:11px;color:#dce8dd;backdrop-filter:blur(6px)}
+.basin-legend{position:absolute;z-index:2;right:var(--edge);bottom:26px;display:grid;gap:4px;max-width:330px;padding:10px 12px;border-radius:9px;background:#0b211abf;border:1px solid #ffffff1f;font-size:11px;color:#dce8dd;backdrop-filter:blur(6px)}
 .basin-legend p{line-height:1.3}
 .basin-legend i{display:inline-block;width:18px;height:3px;margin-right:8px;border-radius:2px;vertical-align:middle}
 .legend-gold{background:#ffd36b;box-shadow:0 0 7px #ffb938}
 .legend-blue{background:#8fdcff}
 .basin-legend .legend-pin{width:7px;height:7px;margin:0 13px 0 5px;border-radius:50%;background:#fff2c4;box-shadow:0 0 0 3px #ffd36b66}
 .basin-legend small{margin-top:3px;font-size:9.5px;line-height:1.4;color:#a9bdb0}
+.basin-legend a,.basin-credit a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.basin-credit{display:none;position:absolute;z-index:4;left:8px;right:8px;bottom:2px;font-size:10px;line-height:1.25;text-align:center;color:#c3d4c8;text-shadow:0 1px 3px #000}
 .basin-lines{position:absolute;inset:0;z-index:2;width:100%;height:100%;pointer-events:none;overflow:visible}
 .basin-lines path{fill:none;stroke:#ffd36b;stroke-width:1.5;stroke-dasharray:5 4;filter:drop-shadow(0 0 3px #000)}
 .study-columns{position:absolute;z-index:3;inset:104px calc(var(--edge) + 40px) 200px calc(var(--edge) - 20px);display:flex;justify-content:space-between;gap:24px;pointer-events:none}
@@ -218,13 +221,17 @@ dialog p{font-size:14px;margin:9px 0}
 .river-panel .basin-actions{margin-top:12px}
 .guide-strip{display:flex;align-items:center;justify-content:space-between;gap:14px;padding-block:18px;font-size:13px;color:var(--muted)}
 @media(min-width:761px){.study-column .study-label:nth-child(n+3){display:none}}
-@media(max-width:1100px){.study-column{width:min(270px,30vw)}.basin-legend{display:none}}
+@media(max-width:1100px){.study-column{width:min(270px,30vw)}.basin-legend{display:none}.basin-credit{display:block}}
 .solo-escritorio{display:none}
 @media(min-width:761px) and (max-width:1100px){.study-columns{bottom:240px}.study-column{gap:8px}.study-column .study-label{padding:10px 12px}}
 @media(min-width:761px){.solo-escritorio{display:inline}}
 @media(max-width:760px){
   .basin-hero{--edge:16px;height:92svh;min-height:600px}
   .over-map .brand span{font-size:21px}
+  .basin-scrim{background:linear-gradient(180deg,#06120de6 0,#06120db3 14%,#06120d00 22%,#06120d00 46%,#06120de6 78%,#06120df2 100%)}
+  .is-focused .basin-scrim{background:linear-gradient(180deg,#06120de6 0,#06120db3 14%,#06120d00 22%,#06120d00 70%,#06120d80 100%)}
+  .basin-credit{top:100px;bottom:auto;left:12px;right:56px;text-align:left}
+  .basin-status{top:30%}
   .basin-intro{right:16px;bottom:84px}
   .basin-intro h1{font-size:clamp(31px,9vw,42px)}
   .basin-intro>p:not(.eyebrow){font-size:13px}

@@ -1,5 +1,5 @@
 /* global self, caches, fetch, URL, Response */
-const CACHE = "quri-nawi-public-v4";
+const CACHE = "quri-nawi-public-v5";
 const shellFiles = [
   "/manifest.webmanifest",
   "/brand/quri-nawi.png",
@@ -9,9 +9,12 @@ const shellFiles = [
   "/geo/rios.json",
   "/geo/relieve.bin",
   "/geo/satelite.jpg",
+  "/geo/normales.jpg",
   "/fonts/inter.woff2",
   "/fonts/space-grotesk.woff2",
 ];
+// Se guardan solo si se usan: la textura de escritorio no se descarga por adelantado.
+const onDemandFiles = ["/geo/satelite-hd.jpg"];
 // Datos públicos: se consultan en línea y, sin conexión, se usa la última copia guardada.
 const dataRoutes = ["/api/catalogo", "/api/fuentes"];
 
@@ -44,7 +47,7 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET" || url.origin !== self.location.origin) return;
   const isHome = request.mode === "navigate" && url.pathname === "/";
   const isBuilt = url.pathname.startsWith("/_next/static/");
-  const isShell = shellFiles.includes(url.pathname);
+  const isShell = shellFiles.includes(url.pathname) || onDemandFiles.includes(url.pathname);
   const isData = dataRoutes.includes(url.pathname);
   if (!isHome && !isBuilt && !isShell && !isData) return;
 
