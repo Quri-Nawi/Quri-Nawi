@@ -1,4 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { writeFile } from 'node:fs/promises';
+
+// Respaldo técnico del estado real del catálogo; no sustituye un pitch narrado.
+test.use({ video: 'on' });
 
 test('catálogo, filtros, comparación, aporte y respaldo offline', async ({ page, context }, testInfo) => {
   const errors = [];
@@ -6,6 +10,12 @@ test('catálogo, filtros, comparación, aporte y respaldo offline', async ({ pag
   await page.goto('/?rio=Kaka');
   await expect(page.locator('.basin-hero')).toHaveAttribute('data-status', 'ready');
   await expect(page.getByRole('region', { name: 'Río Kaka', exact: true })).toBeVisible();
+  const frameCadence = await page.evaluate(() => new Promise(resolve => {
+    const frames = [];
+    const start = performance.now();
+    const tick = time => { frames.push(time); if (time - start < 1000) requestAnimationFrame(tick); else resolve({ frames: frames.length, milliseconds: time - start, rafPerSecond: 1000 * (frames.length - 1) / (time - frames[0]) }); };
+    requestAnimationFrame(tick);
+  }));
   await page.getByRole('button', { name: 'Ver en la lista' }).click();
   await expect(page.locator('.record')).toHaveCount(2);
   await page.locator('.record summary').first().click();
@@ -29,7 +39,9 @@ test('catálogo, filtros, comparación, aporte y respaldo offline', async ({ pag
     await navigator.serviceWorker.ready;
     if (!navigator.serviceWorker.controller) await new Promise(resolve => navigator.serviceWorker.addEventListener('controllerchange', resolve, { once: true }));
   });
-  const metrics = await page.evaluate(() => ({ userAgent: navigator.userAgent, navigation: performance.getEntriesByType('navigation')[0].toJSON(), resources: performance.getEntriesByType('resource').map(({ name, transferSize, decodedBodySize, duration }) => ({ name: new URL(name).pathname, transferSize, decodedBodySize, duration })) }));
+  const metrics = await page.evaluate(() => ({ paints: performance.getEntriesByType('paint').map(p => p.toJSON()), userAgent: navigator.userAgent, navigation: performance.getEntriesByType('navigation')[0].toJSON(), resources: performance.getEntriesByType('resource').map(({ name, transferSize, decodedBodySize, duration }) => ({ name: new URL(name).pathname, transferSize, decodedBodySize, duration })) }));
+  metrics.frameCadence = frameCadence;
+  await writeFile(testInfo.outputPath('recursos.json'), JSON.stringify(metrics, null, 2));
   await testInfo.attach('recursos.json', { body: JSON.stringify(metrics, null, 2), contentType: 'application/json' });
   await page.goto('/?rio=Kaka');
   await expect(page.locator('.basin-hero')).toHaveAttribute('data-status', 'ready');

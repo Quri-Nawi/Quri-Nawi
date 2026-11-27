@@ -20,7 +20,7 @@ El contrato actual del MCP **no almacena el expediente por campo**: `motivo` adm
 6. Añadir las fuentes nuevas al registro/CSV y ejecutar `npm run check`, `npm test`, `npm run test:browser`. Integrar únicamente tras la aprobación y autorización necesarias para los datos. La web combina las semillas documentales existentes con publicaciones que pasan el filtro de revisión. Tanto lista, mapa, comparación como `/api/catalogo` leen esos mismos IDs.
 7. Mantener coherencia con el catálogo canónico del MCP mediante un PR en ese repositorio: mismo ID y versión, fuente, revisor, permiso y precisión. No hay una transacción ni sincronización automática entre ambos repositorios. Hasta aprobar allí, la ficha no se considera publicada por MCP. Jhamil conserva la responsabilidad de esa integración (#4).
 
-`/api/catalogo.review` distingue semillas sin aprobación institucional y publicaciones con historial. Una propuesta pendiente/rechazada, un permiso vencido/restringido y campos ajenos a la lista pública se excluyen de publicaciones. `npm run datos` rechaza expedientes inválidos o propuestas repetidas en el manifiesto. Los borradores permanecen fuera de las API públicas.
+`/api/catalogo.review` distingue semillas sin aprobación institucional y publicaciones con historial. Una propuesta pendiente/rechazada, un permiso vencido/restringido y campos ajenos a la lista pública se excluyen de publicaciones. `npm run datos` rechaza expedientes inválidos o IDs de ficha repetidos en el manifiesto. Un estudio puede respaldar varias fichas con IDs distintos y el mismo ID de propuesta D1; volver a enviar su referencia no crea otra propuesta. Los borradores permanecen fuera de las API públicas.
 
 ## Demostración y límites comprobados
 

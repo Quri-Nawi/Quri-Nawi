@@ -46,13 +46,13 @@ La aplicación ya cubre el recorrido de consulta: explorar la cuenca, abrir la f
 | 📖 **Fichas** | ✅ | 11 fichas con nivel de verificación, qué se comprobó, límites y fuentes enlazadas; fechas de muestreo y publicación separadas. | Revisión por especialistas y organizaciones dueñas de los datos. |
 | 🧾 **Respaldo de datos** | ✅ | 52 fuentes y 40 cifras con estado y redacción segura, en la app, en `/api/fuentes` y en `docs/fuentes`. `npm run datos` falla si algo no cuadra. | Revisión periódica (ver `docs/fuentes/LIMITES_Y_MANTENIMIENTO.md`). |
 | ⚖️ **Comparar evidencia** | 🟡 | Dos fichas lado a lado, con una nota que explica los límites de la comparación. | Analito, método y unidad como campos; señal de posibles duplicados. |
-| ✍️ **Aportes** | 🟡 | Borradores en el navegador, con validación de DOI o enlace `https://` y control de repetidos. | Envío a revisión y persistencia en servidor. |
-| 🧾 **Extracción y revisión** | ⏳ | — | Cargar un PDF, sugerir campos con página y corregir antes de publicar. |
+| ✍️ **Aportes** | 🟡 | Borradores, expediente descargable y envío opcional de referencias a la cola D1 existente. | Habilitar y validar conjuntamente el servicio; revisión institucional. |
+| 🧾 **Extracción y revisión** | 🟡 | Piloto PDF/TXT local: sugerencias con página y fragmento, corrección humana y expediente pendiente descargable. | Revisar el piloto y ampliar a más informes; publicación institucional. |
 | 🔐 **Permisos e historial** | ⏳ | Solo se sirven registros públicos. | Roles, historial, retiro y registros restringidos. |
 | 📱 **PWA** | ✅ | Instalable. Tras la primera carga, la portada y el catálogo se consultan sin conexión. | — |
 | 🤖 **Agentes** | 🟡 | Catálogo y respaldo en JSON en `/api/catalogo` y `/api/fuentes`. | Conectar el MCP de referencia a la misma vista. |
 | 👥 **Validación con usuarios** | ⏳ | Plan y criterio de éxito en [docs/viabilidad.md](docs/viabilidad.md). | Hacer la prueba con 5 a 8 personas. **Aún no se ha hecho.** |
-| 🧪 **Calidad** | ✅ | CI con validación de datos, lint, tipos, compilación y `npm audit`; prueba HTTP de portada, respaldo, APIs y PWA. | Pruebas en navegador. |
+| 🧪 **Calidad** | ✅ | CI con datos, lint, tipos, build, auditoría, pruebas unitarias, HTTP y Chromium en escritorio/móvil emulado. | Android/iOS físicos y revisión de accesibilidad. |
 
 <sub>✅ listo · 🟡 en curso · ⏳ pendiente</sub>
 
@@ -284,7 +284,7 @@ El CI corre en cada *pull request* y en cada cambio a `main`.
 
 ## 🔐 Datos y seguridad
 
-- 🏷️ Solo se publican registros públicos. Los borradores se quedan en el navegador de quien los crea.
+- 🏷️ Los borradores y las extracciones completas quedan en el navegador. El envío opcional transfiere título, fuente y territorio a la cola D1 privada; no publica una ficha.
 - 🩺 Los datos de salud se muestran agregados, sin datos individuales ni ubicaciones precisas.
 - 📄 Los estudios de terceros se enlazan; no se redistribuyen sus PDF.
 - 🧾 Ninguna cifra se publica sin fuente, alcance y estado. Los límites de lo que no se puede afirmar están en [docs/fuentes/LIMITES_Y_MANTENIMIENTO.md](docs/fuentes/LIMITES_Y_MANTENIMIENTO.md).
@@ -317,3 +317,5 @@ Trabaja en una rama desde `main`, limita el cambio a una sección y abre una sol
 Los borradores permiten descargar un expediente para revisión por PR. El envío de referencias a la cola D1 existente se habilita con `QURI_PROPOSALS_ENABLED=1`; conserva el borrador si falla y muestra el ID únicamente tras confirmación. No necesita token administrativo. [Contrato, procedimiento de revisión, publicación y límites](docs/revision-publicacion.md). Las semillas documentales conservan revisión institucional pendiente; aceptar en la cola no publica una ficha.
 
 La [verificación reproducible de la demo](docs/verificacion/demo-automatizada.md) incluye pruebas de producción con Chromium, capturas desktop/móvil, modo offline y recuperación WebGL. Ejecuta `npm test` y `npm run test:browser` además de `npm run check`.
+
+[Extracción revisable y evaluación con un informe real](docs/extraccion-revisable.md): piloto local con PDF/TXT, campos ausentes explícitos, revisión por campo y propuesta pendiente. No usa OCR ni publica automáticamente.

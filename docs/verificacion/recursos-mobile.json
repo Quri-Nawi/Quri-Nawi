@@ -1,0 +1,205 @@
+{
+  "paints": [
+    {
+      "name": "first-paint",
+      "entryType": "paint",
+      "startTime": 316,
+      "duration": 0,
+      "navigationId": 8565,
+      "paintTime": 92.19999999925494,
+      "presentationTime": 316
+    },
+    {
+      "name": "first-contentful-paint",
+      "entryType": "paint",
+      "startTime": 316,
+      "duration": 0,
+      "navigationId": 8565,
+      "paintTime": 92.19999999925494,
+      "presentationTime": 316
+    }
+  ],
+  "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/159.0.8154.6 Mobile Safari/537.36",
+  "navigation": {
+    "name": "http://127.0.0.1:3100/?rio=Kaka",
+    "entryType": "navigation",
+    "startTime": 0,
+    "duration": 159.09999999776483,
+    "navigationId": 8565,
+    "initiatorType": "navigation",
+    "deliveryType": "",
+    "nextHopProtocol": "http/1.1",
+    "renderBlockingStatus": "non-blocking",
+    "contentType": "text/html",
+    "contentEncoding": "gzip",
+    "workerStart": 0,
+    "workerRouterEvaluationStart": 0,
+    "workerCacheLookupStart": 0,
+    "workerMatchedRouterSource": "",
+    "workerFinalRouterSource": "",
+    "workerMatchedSourceType": "",
+    "workerFinalSourceType": "",
+    "redirectStart": 0,
+    "redirectEnd": 0,
+    "fetchStart": 0.19999999925494194,
+    "domainLookupStart": 1.5999999977648258,
+    "domainLookupEnd": 1.5999999977648258,
+    "connectStart": 1.5999999977648258,
+    "secureConnectionStart": 0,
+    "connectEnd": 2.099999997764826,
+    "requestStart": 2.2999999970197678,
+    "responseStart": 10.299999997019768,
+    "firstInterimResponseStart": 0,
+    "finalResponseHeadersStart": 10.299999997019768,
+    "responseEnd": 11.5,
+    "transferSize": 20413,
+    "encodedBodySize": 20113,
+    "decodedBodySize": 92988,
+    "responseStatus": 200,
+    "serverTiming": [],
+    "unloadEventStart": 0,
+    "unloadEventEnd": 0,
+    "domInteractive": 107.29999999701977,
+    "domContentLoadedEventStart": 107.29999999701977,
+    "domContentLoadedEventEnd": 107.39999999850988,
+    "domComplete": 159,
+    "loadEventStart": 159.09999999776483,
+    "loadEventEnd": 159.09999999776483,
+    "type": "navigate",
+    "redirectCount": 0,
+    "activationStart": 0,
+    "criticalCHRestart": 0,
+    "notRestoredReasons": null,
+    "confidence": {
+      "randomizedTriggerRate": 0.4994798,
+      "value": "high"
+    }
+  },
+  "resources": [
+    {
+      "name": "/_next/static/chunks/0nk18rpshu053.css",
+      "transferSize": 8100,
+      "decodedBodySize": 31028,
+      "duration": 14.300000000745058
+    },
+    {
+      "name": "/_next/static/chunks/0kqziy-7_gy73.js",
+      "transferSize": 7732,
+      "decodedBodySize": 22335,
+      "duration": 14.5
+    },
+    {
+      "name": "/_next/static/chunks/395glp5--7qza.js",
+      "transferSize": 48777,
+      "decodedBodySize": 181715,
+      "duration": 32.19999999925494
+    },
+    {
+      "name": "/_next/static/chunks/0wu67ee786qhr.js",
+      "transferSize": 783,
+      "decodedBodySize": 483,
+      "duration": 17.400000002235174
+    },
+    {
+      "name": "/_next/static/chunks/turbopack-2u1d16houkiyo.js",
+      "transferSize": 4205,
+      "decodedBodySize": 9974,
+      "duration": 25.600000001490116
+    },
+    {
+      "name": "/_next/static/chunks/3qfy96eoyh-ek.js",
+      "transferSize": 3815,
+      "decodedBodySize": 13994,
+      "duration": 25.5
+    },
+    {
+      "name": "/_next/static/chunks/092r-mewpaf3q.js",
+      "transferSize": 71981,
+      "decodedBodySize": 229052,
+      "duration": 33.5
+    },
+    {
+      "name": "/_next/static/chunks/0ch3_p85p9fiq.js",
+      "transferSize": 27045,
+      "decodedBodySize": 79970,
+      "duration": 27
+    },
+    {
+      "name": "/fonts/inter.woff2",
+      "transferSize": 48556,
+      "decodedBodySize": 48256,
+      "duration": 52.69999999925494
+    },
+    {
+      "name": "/fonts/space-grotesk.woff2",
+      "transferSize": 22588,
+      "decodedBodySize": 22288,
+      "duration": 37.19999999925494
+    },
+    {
+      "name": "/brand/quri-nawi.png",
+      "transferSize": 85822,
+      "decodedBodySize": 85522,
+      "duration": 6.300000000745058
+    },
+    {
+      "name": "/_next/static/chunks/00e7dx1p4qwtm.js",
+      "transferSize": 9150,
+      "decodedBodySize": 30840,
+      "duration": 5.200000002980232
+    },
+    {
+      "name": "/_next/static/chunks/1bw2qd5p3et8s.js",
+      "transferSize": 185502,
+      "decodedBodySize": 738045,
+      "duration": 30.899999998509884
+    },
+    {
+      "name": "/_next/static/chunks/2wtl_zkc208u-.js",
+      "transferSize": 3728,
+      "decodedBodySize": 8521,
+      "duration": 8.100000001490116
+    },
+    {
+      "name": "/geo/rios.json",
+      "transferSize": 13254,
+      "decodedBodySize": 41512,
+      "duration": 13.600000001490116
+    },
+    {
+      "name": "/geo/relieve.bin",
+      "transferSize": 599340,
+      "decodedBodySize": 599040,
+      "duration": 17.400000002235174
+    },
+    {
+      "name": "/geo/satelite.jpg",
+      "transferSize": 300,
+      "decodedBodySize": 561855,
+      "duration": 4.800000000745058
+    },
+    {
+      "name": "/geo/normales.jpg",
+      "transferSize": 300,
+      "decodedBodySize": 693894,
+      "duration": 7.300000000745058
+    },
+    {
+      "name": "/brand/gold-for-good.svg",
+      "transferSize": 0,
+      "decodedBodySize": 8731,
+      "duration": 6.100000001490116
+    },
+    {
+      "name": "/api/propuestas",
+      "transferSize": 429,
+      "decodedBodySize": 126,
+      "duration": 4.5
+    }
+  ],
+  "frameCadence": {
+    "frames": 20,
+    "milliseconds": 1291.3000000000002,
+    "rafPerSecond": 14.616508962227858
+  }
+}

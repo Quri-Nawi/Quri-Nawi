@@ -16,10 +16,14 @@
     "smoke": "node scripts/smoke.mjs",
     "datos": "node --no-warnings scripts/validar-datos.mjs && node --no-warnings scripts/validar-publicaciones.mjs",
     "test:browser": "playwright test",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "predev": "node scripts/preparar-pdf.mjs",
+    "prebuild": "node scripts/preparar-pdf.mjs",
+    "demo:informe": "node scripts/descargar-informe-demo.mjs"
   },
   "dependencies": {
     "next": "16.4.6",
+    "pdfjs-dist": "6.5.438",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "three": "0.187.0"

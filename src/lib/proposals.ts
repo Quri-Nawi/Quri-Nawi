@@ -1,6 +1,8 @@
+import type { Extraction } from "./extraction";
+
 /** Contrato web → cola privada existente; nunca incluye un token administrativo. */
 export type Receipt = { id: string; estado: "pendiente_revision" | "aceptada" | "rechazada"; duplicado: boolean };
-export type Draft = { title: string; url: string; territory: string; receipt?: Receipt };
+export type Draft = { title: string; url: string; territory: string; extraction?: Extraction; receipt?: Receipt };
 export const proposalEndpoint = "https://goldeye-trace-mcp.pinata-server.workers.dev/mcp";
 
 export function sourceUrl(value: string) {

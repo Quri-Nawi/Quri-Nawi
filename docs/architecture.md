@@ -55,3 +55,7 @@ La primera versión usa el App Router de Next.js con TypeScript y npm. La portad
 - No proyecta concentraciones, tendencias ni efectos en salud. Esas proyecciones necesitan series de medición y un modelo revisado por especialistas.
 - Los ODS mostrados (3, 6, 12 y 15) y el Convenio de Minamata indican a qué compromisos aporta cada tipo de evidencia; no son metas medidas por la app.
 
+
+## Propuestas y extracción revisable
+
+El [contrato de revisión y publicación](revision-publicacion.md) documenta `POST /api/propuestas`, el envío opcional a la cola D1 existente y el manifiesto de publicaciones revisadas. El [piloto de extracción](extraccion-revisable.md) procesa PDF/TXT localmente, conserva respaldo y correcciones por campo y entrega un expediente pendiente al mismo flujo. La autenticación y revisión administrativa continúan a cargo del procedimiento por PR y del MCP; no se expone un token administrativo al cliente.

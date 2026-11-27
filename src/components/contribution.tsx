@@ -2,6 +2,8 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 
+import { ExtractionForm } from "./extraction";
+import { extractionLimits, type Extraction } from "../lib/extraction";
 import { parseDraft, sourceUrl, type Draft, type Receipt } from "../lib/proposals";
 const key = "quri-nawi:proposals:v1";
 // Borradores guardados antes del cambio de nombre; se leen si aún no hay borradores con la clave nueva.
@@ -80,8 +82,16 @@ export function Contribution() {
     } finally { setSending(null); }
   }
 
+  function saveExtraction(extraction: Extraction, territory: string) {
+    if (sending) return false;
+    const title = extraction.fields.find(field => field.suggestion.field === "title")?.value ?? "";
+    const draft = { ...parseDraft({ title, url: extraction.source, territory }), extraction };
+    const exists = drafts.find(item => sourceUrl(item.url) === draft.url && item.territory === territory);
+    return persist(exists ? drafts.map(item => item === exists ? { ...draft, receipt: exists.receipt } : item) : [...drafts, draft], "Extracción revisada guardada como propuesta pendiente en este dispositivo.");
+  }
+
   function download(draft: Draft) {
-    const envelope = { schema: "quri-propuesta-v1", state: "pendiente_revision", created: new Date().toISOString(), draft: parseDraft(draft), queue: draft.receipt ?? null, review: null };
+    const envelope = { schema: "quri-propuesta-v1", state: "pendiente_revision", created: new Date().toISOString(), draft: parseDraft(draft), queue: draft.receipt ?? null, extraction: draft.extraction ?? null, extractionLimits: draft.extraction ? extractionLimits : null, review: null };
     const url = URL.createObjectURL(new Blob([JSON.stringify(envelope, null, 2)], { type: "application/json" }));
     const anchor = document.createElement("a");
     anchor.href = url; anchor.download = "quri-propuesta.json"; anchor.click();
@@ -96,6 +106,7 @@ export function Contribution() {
         <p>Guarda la referencia que quieres proponer. El borrador queda en tu navegador. Puedes enviar su referencia a la cola privada y descargar el expediente para revisión por PR. Una ficha requiere revisión y autorización antes de publicarse.</p>
       </div>
       <div className="contribution-panel">
+        <ExtractionForm onSave={saveExtraction} />
         <form onSubmit={submit}>
           <label>Título del estudio<input name="title" placeholder="Ej. Mercurio en sedimentos del río…" maxLength={150} required /></label>
           <label>DOI o enlace de la fuente<input name="source" placeholder="Pega el enlace" maxLength={500} required /></label>

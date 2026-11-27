@@ -24,6 +24,6 @@ test('rechazo, permiso ausente/vencido, historial inválido y campos privados nu
 });
 test('el catálogo vigente no inventa aprobación para las semillas', async () => {
   const { reviewedPublications, records } = await import('../src/lib/catalog.ts');
-  assert.equal(reviewedPublications.length, 0);
-  assert.equal(records.length, seedRecords.length);
+  assert.ok(seedRecords.every(seed => !reviewedPublications.some(p => p.record.id === seed.id)));
+  assert.equal(records.length, seedRecords.length + reviewedPublications.length);
 });

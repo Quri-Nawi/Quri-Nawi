@@ -368,3 +368,22 @@ dialog p{font-size:14px;margin:9px 0}
 }
 
 .drafts li{flex-wrap:wrap}.drafts li>div:first-child{flex:1 1 180px}
+
+.extraction{margin-bottom:22px;border-bottom:1px solid var(--line);padding-bottom:18px}
+.extraction summary{cursor:pointer;font-weight:600}
+.extraction p{margin-block:10px;font-size:13px}
+.contribution-panel .extraction-review{display:block}
+.extraction label{display:grid;gap:5px;margin-block:12px;min-width:0}
+.document-hash{display:block;overflow-wrap:anywhere}
+.extraction-fields{display:flex;flex-wrap:wrap;gap:8px;margin-block:16px}
+.extraction-fields button{padding:6px;border:1px solid var(--line);border-radius:4px;font-size:12px}
+.extraction-fields button[aria-pressed=true]{background:var(--forest);color:white}
+.extraction-columns{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.extraction-columns>div{min-width:0}
+.extraction pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:420px;overflow:auto;background:var(--paper);padding:12px;font-size:12px}
+.extraction blockquote{margin:12px 0;border-left:3px solid var(--line);padding-left:12px;overflow-wrap:anywhere}
+.extraction cite{font-size:12px}
+.extraction textarea{width:100%;min-height:80px;resize:vertical;border:1px solid var(--line);padding:8px;font:inherit}
+.extraction .extraction-permission{display:flex;align-items:flex-start;font-size:12px;line-height:1.5}
+.extraction-permission input{width:auto;flex-shrink:0;margin-top:3px}
+@media(max-width:760px){.extraction-columns{grid-template-columns:1fr}.extraction pre{max-height:230px}}

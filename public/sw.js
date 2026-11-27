@@ -1,5 +1,5 @@
 /* global self, caches, fetch, URL, Response */
-const CACHE = "quri-nawi-public-v6";
+const CACHE = "quri-nawi-public-v7";
 const shellFiles = [
   "/manifest.webmanifest",
   "/brand/quri-nawi.png",
@@ -14,7 +14,7 @@ const shellFiles = [
   "/fonts/space-grotesk.woff2",
 ];
 // Se guardan solo si se usan: la textura de escritorio no se descarga por adelantado.
-const onDemandFiles = ["/geo/satelite-hd.jpg"];
+const onDemandFiles = ["/geo/satelite-hd.jpg", "/pdf.worker.min.mjs"];
 // Datos públicos: se consultan en línea y, sin conexión, se usa la última copia guardada.
 const dataRoutes = ["/api/catalogo", "/api/fuentes"];
 

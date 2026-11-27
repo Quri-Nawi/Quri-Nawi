@@ -56,3 +56,7 @@ Se verificó la pérdida forzada del contexto WebGL y el enlace de recuperación
 - CEDIB, informe original, figura 12 y tablas por fases. https://www.cedib.org/wp-content/uploads/2026/08/MERCURIO-Y-SALUD-EN-LA-AMAZONIA-BOLIVIANA-.pdf
 - Guía específica ORO-3.3, página física 4 sobre entregable y página 5 sobre evaluación, archivada en 02_Desafios/fuentes/desafio_03.
 - Las comprobaciones restantes de las 52 fuentes se atribuyen al paquete recibido. Esta revisión no repitió íntegramente las 52.
+
+## Avances posteriores en issues #8, #9 y #12
+
+La verificación reproducible, capturas y grabación técnica se describen en [demo automatizada](verificacion/demo-automatizada.md). El [flujo de propuesta y revisión](revision-publicacion.md) incorpora envío opcional de referencias a la cola existente y validaciones de publicación por PR. La [extracción PDF/TXT revisable](extraccion-revisable.md) ya tiene un piloto acotado y un caso real reproducible. Esto no acredita pruebas físicas, revisión científica/institucional ni validación conjunta con Jhamil; esas brechas permanecen.

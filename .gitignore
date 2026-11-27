@@ -15,3 +15,5 @@ scripts/.cache/
 
 playwright-report/
 test-results/
+
+public/pdf.worker.min.mjs

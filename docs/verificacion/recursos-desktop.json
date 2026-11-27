@@ -1,0 +1,211 @@
+{
+  "paints": [
+    {
+      "name": "first-paint",
+      "entryType": "paint",
+      "startTime": 348,
+      "duration": 0,
+      "navigationId": 8973,
+      "paintTime": 127,
+      "presentationTime": 348
+    },
+    {
+      "name": "first-contentful-paint",
+      "entryType": "paint",
+      "startTime": 348,
+      "duration": 0,
+      "navigationId": 8973,
+      "paintTime": 127,
+      "presentationTime": 348
+    }
+  ],
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/159.0.8154.6 Safari/537.36",
+  "navigation": {
+    "name": "http://127.0.0.1:3100/?rio=Kaka",
+    "entryType": "navigation",
+    "startTime": 0,
+    "duration": 190.19999999925494,
+    "navigationId": 8973,
+    "initiatorType": "navigation",
+    "deliveryType": "",
+    "nextHopProtocol": "http/1.1",
+    "renderBlockingStatus": "non-blocking",
+    "contentType": "text/html",
+    "contentEncoding": "gzip",
+    "workerStart": 0,
+    "workerRouterEvaluationStart": 0,
+    "workerCacheLookupStart": 0,
+    "workerMatchedRouterSource": "",
+    "workerFinalRouterSource": "",
+    "workerMatchedSourceType": "",
+    "workerFinalSourceType": "",
+    "redirectStart": 0,
+    "redirectEnd": 0,
+    "fetchStart": 0.19999999925494194,
+    "domainLookupStart": 1,
+    "domainLookupEnd": 1.0999999977648258,
+    "connectStart": 1.0999999977648258,
+    "secureConnectionStart": 0,
+    "connectEnd": 3.599999997764826,
+    "requestStart": 3.7999999970197678,
+    "responseStart": 32,
+    "firstInterimResponseStart": 0,
+    "finalResponseHeadersStart": 32,
+    "responseEnd": 32.899999998509884,
+    "transferSize": 20413,
+    "encodedBodySize": 20113,
+    "decodedBodySize": 92988,
+    "responseStatus": 200,
+    "serverTiming": [],
+    "unloadEventStart": 0,
+    "unloadEventEnd": 0,
+    "domInteractive": 74.09999999776483,
+    "domContentLoadedEventStart": 74.09999999776483,
+    "domContentLoadedEventEnd": 74.19999999925494,
+    "domComplete": 190.19999999925494,
+    "loadEventStart": 190.19999999925494,
+    "loadEventEnd": 190.19999999925494,
+    "type": "navigate",
+    "redirectCount": 0,
+    "activationStart": 0,
+    "criticalCHRestart": 0,
+    "notRestoredReasons": null,
+    "confidence": {
+      "randomizedTriggerRate": 0.4994798,
+      "value": "low"
+    }
+  },
+  "resources": [
+    {
+      "name": "/_next/static/chunks/0nk18rpshu053.css",
+      "transferSize": 8100,
+      "decodedBodySize": 31028,
+      "duration": 24.600000001490116
+    },
+    {
+      "name": "/_next/static/chunks/0kqziy-7_gy73.js",
+      "transferSize": 7732,
+      "decodedBodySize": 22335,
+      "duration": 23
+    },
+    {
+      "name": "/_next/static/chunks/395glp5--7qza.js",
+      "transferSize": 48777,
+      "decodedBodySize": 181715,
+      "duration": 36.19999999925494
+    },
+    {
+      "name": "/_next/static/chunks/092r-mewpaf3q.js",
+      "transferSize": 71981,
+      "decodedBodySize": 229052,
+      "duration": 42.69999999925494
+    },
+    {
+      "name": "/_next/static/chunks/3qfy96eoyh-ek.js",
+      "transferSize": 3815,
+      "decodedBodySize": 13994,
+      "duration": 34.400000002235174
+    },
+    {
+      "name": "/_next/static/chunks/0wu67ee786qhr.js",
+      "transferSize": 783,
+      "decodedBodySize": 483,
+      "duration": 34.600000001490116
+    },
+    {
+      "name": "/_next/static/chunks/turbopack-2u1d16houkiyo.js",
+      "transferSize": 4205,
+      "decodedBodySize": 9974,
+      "duration": 34.30000000074506
+    },
+    {
+      "name": "/_next/static/chunks/0ch3_p85p9fiq.js",
+      "transferSize": 27045,
+      "decodedBodySize": 79970,
+      "duration": 41.19999999925494
+    },
+    {
+      "name": "/fonts/inter.woff2",
+      "transferSize": 48556,
+      "decodedBodySize": 48256,
+      "duration": 48.5
+    },
+    {
+      "name": "/fonts/space-grotesk.woff2",
+      "transferSize": 22588,
+      "decodedBodySize": 22288,
+      "duration": 40.100000001490116
+    },
+    {
+      "name": "/brand/quri-nawi.png",
+      "transferSize": 85822,
+      "decodedBodySize": 85522,
+      "duration": 7
+    },
+    {
+      "name": "/_next/static/chunks/00e7dx1p4qwtm.js",
+      "transferSize": 9150,
+      "decodedBodySize": 30840,
+      "duration": 10.100000001490116
+    },
+    {
+      "name": "/_next/static/chunks/1bw2qd5p3et8s.js",
+      "transferSize": 185502,
+      "decodedBodySize": 738045,
+      "duration": 39.5
+    },
+    {
+      "name": "/_next/static/chunks/2wtl_zkc208u-.js",
+      "transferSize": 3728,
+      "decodedBodySize": 8521,
+      "duration": 13.699999999254942
+    },
+    {
+      "name": "/geo/rios.json",
+      "transferSize": 13254,
+      "decodedBodySize": 41512,
+      "duration": 14
+    },
+    {
+      "name": "/geo/relieve.bin",
+      "transferSize": 599340,
+      "decodedBodySize": 599040,
+      "duration": 20.399999998509884
+    },
+    {
+      "name": "/geo/satelite.jpg",
+      "transferSize": 300,
+      "decodedBodySize": 561855,
+      "duration": 9.100000001490116
+    },
+    {
+      "name": "/geo/normales.jpg",
+      "transferSize": 300,
+      "decodedBodySize": 693894,
+      "duration": 13.800000000745058
+    },
+    {
+      "name": "/geo/satelite-hd.jpg",
+      "transferSize": 1951199,
+      "decodedBodySize": 1950899,
+      "duration": 22.599999997764826
+    },
+    {
+      "name": "/brand/gold-for-good.svg",
+      "transferSize": 0,
+      "decodedBodySize": 8731,
+      "duration": 4.100000001490116
+    },
+    {
+      "name": "/api/propuestas",
+      "transferSize": 429,
+      "decodedBodySize": 126,
+      "duration": 13.5
+    }
+  ],
+  "frameCadence": {
+    "frames": 16,
+    "milliseconds": 1376,
+    "rafPerSecond": 10.97614517781355
+  }
+}
