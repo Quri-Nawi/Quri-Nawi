@@ -8,7 +8,7 @@ type Status = "idle" | "connecting" | "listening" | "speaking" | "error";
 type Lines = { quri: string; user: string };
 
 const parts = ["torso", "left", "right", "eyeL", "eyeR", "mouth"] as const;
-const SESSION_LIMIT_MS = 3 * 60 * 1000;
+const SESSION_LIMIT_MS = 5 * 60 * 1000;
 const clamp = (x: number, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const smooth = (x: number) => { const t = clamp(x); return t * t * (3 - 2 * t); };
 const rad = (deg: number) => (deg * Math.PI) / 180;
@@ -171,20 +171,29 @@ export function Quri() {
     setLines({ quri: "Te escucho en un momento…", user: "" });
     wave.current = performance.now() / 1000;
     let mic: MediaStream;
+    const ctx = new AudioContext();
+    let voice: MediaStreamTrack;
     try {
-      mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      // Sin ganancia automática (subía ruidos lejanos) y con un filtro que quita zumbidos y golpes graves bajo 180 Hz.
+      mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: false } });
+      const highpass = ctx.createBiquadFilter();
+      highpass.type = "highpass";
+      highpass.frequency.value = 180;
+      const filtered = ctx.createMediaStreamDestination();
+      ctx.createMediaStreamSource(mic).connect(highpass).connect(filtered);
+      voice = filtered.stream.getAudioTracks()[0];
     } catch {
+      ctx.close().catch(() => undefined);
       stop("Necesito permiso para usar el micrófono. Actívalo en el navegador y vuelve a tocarme.");
       return;
     }
     try {
       const answer = await fetch("/api/quri-sesion", { method: "POST" });
       const data = (await answer.json()) as { value?: string; error?: string };
-      if (!answer.ok || !data.value) { mic.getTracks().forEach((track) => track.stop()); stop(data.error ?? "No pude conectarme."); return; }
+      if (!answer.ok || !data.value) { mic.getTracks().forEach((track) => track.stop()); ctx.close().catch(() => undefined); stop(data.error ?? "No pude conectarme."); return; }
       const pc = new RTCPeerConnection();
       const audio = new Audio();
       audio.autoplay = true;
-      const ctx = new AudioContext();
       pc.ontrack = (event) => {
         audio.srcObject = event.streams[0];
         // El analizador mide la voz de Quri para abrir la boca al ritmo del audio.
@@ -202,7 +211,7 @@ export function Quri() {
         };
         sample();
       };
-      pc.addTrack(mic.getTracks()[0], mic);
+      pc.addTrack(voice, mic);
       const dc = pc.createDataChannel("oai-events");
       const send = (event: object) => { if (dc.readyState === "open") dc.send(JSON.stringify(event)); };
       dc.onopen = () => {
@@ -237,6 +246,7 @@ export function Quri() {
       session.current = { pc, dc, mic, audio, ctx, timer };
     } catch {
       mic.getTracks().forEach((track) => track.stop());
+      ctx.close().catch(() => undefined);
       stop("Se cortó la conexión. Toca a Quri para intentarlo de nuevo.");
     }
   }
