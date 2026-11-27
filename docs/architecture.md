@@ -72,4 +72,4 @@ El [contrato de revisión y publicación](revision-publicacion.md) documenta `PO
 - `src/components/quri.tsx` dibuja a Quri en canvas con las piezas de `public/quri` (cuerpo, brazos, ojos y boca): respira, parpadea, sigue el puntero, saluda y mueve la boca con el volumen real de su voz. Se asoma por el borde derecho en la vista general y por el izquierdo con un río abierto.
 - Al tocarlo pide el micrófono, solicita a `/api/quri-sesion` una clave temporal de OpenAI Realtime (`gpt-realtime-2.1-mini`, 60 s para conectar) y conversa por WebRTC. La clave del proyecto (`API_KEY_OPENAI`) solo vive en el servidor, que fija instrucciones, herramientas y tope de respuesta.
 - Herramientas: `enfocar_rio`, `ver_escenario` y `volver_a_la_cuenca`. El navegador las ejecuta con el evento `quri:control` y devuelve las fichas del río, para que Quri hable solo con el catálogo.
-- Límites para cuidar el saldo: 6 sesiones por cliente cada 10 minutos y 60 en total por instancia; cada conversación se corta a los 3 minutos.
+- Límites para cuidar el saldo: 6 sesiones por cliente cada 10 minutos y 60 en total por instancia; cada conversación se corta a los 5 minutos.
