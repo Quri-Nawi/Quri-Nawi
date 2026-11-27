@@ -519,3 +519,33 @@ h1,h2,h3,.brand span,.footer-inner strong,.measurement,.study-value,.river-tag,.
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes orbit{from{transform:rotate(0) translateX(44px) scaleY(.4) rotate(0)}to{transform:rotate(360deg) translateX(44px) scaleY(.4) rotate(-360deg)}}
 @media(prefers-reduced-motion:reduce){.viz-count strong,.viz-count path,.viz-route path,.viz-orbit .cube,.viz-orbit b{animation:none;stroke-dashoffset:0}}
+
+/* Más mapa a la vista: texto y alertas pegados a la izquierda, leyenda y controles a la derecha, todo más compacto */
+@media(min-width:761px){
+  .basin-hero{--side:clamp(18px,2.6vw,56px)}
+  .basin-intro{left:var(--side);bottom:84px;max-width:min(440px,36vw)}
+  .basin-intro h1{font-size:clamp(32px,3.2vw,52px);margin:10px 0 12px}
+  .basin-intro>p:not(.eyebrow){font-size:14px;max-width:38ch}
+  .basin-intro.is-outlook{bottom:auto;top:150px;max-width:min(360px,30vw)}
+  .basin-intro.is-outlook h1{font-size:clamp(22px,1.9vw,32px);line-height:1.05;margin:6px 0 6px}
+  .basin-intro.is-outlook .basin-actions{margin-top:12px}
+  .basin-intro.is-outlook .basin-actions .button{min-height:40px;padding-inline:12px;font-size:12px}
+  .basin-legend{right:var(--side);max-width:290px;font-size:10.5px}
+  .basin-tools{right:var(--side);top:150px;translate:none} /* arriba a la derecha, donde no tapan ríos ni etiquetas */
+  .priority-list{gap:6px}
+  .alert-card{grid-template-columns:auto auto;justify-content:space-between;padding:7px 10px 7px 12px}
+  .alert-age{font-size:22px}
+  .spark{width:58px;height:22px}
+  .alert-missing{font-size:10.5px}
+}
+@media(min-width:761px) and (max-height:820px){
+  .basin-intro.is-outlook{top:138px}
+  .alert-missing{display:none}
+}
+/* ODS compactos: solo el número; el nombre se despliega al pasar el cursor o con el teclado */
+.goal-chips{gap:5px}
+.goal-chips li{padding:3px;gap:0;cursor:default;transition:padding .25s,gap .25s}
+.goal-chips li span{max-width:0;overflow:hidden;white-space:nowrap;opacity:0;transition:max-width .35s,opacity .25s}
+.goal-chips li:hover,.goal-chips li:focus-within{padding-right:9px;gap:6px}
+.goal-chips li:hover span,.goal-chips li:focus-within span{max-width:180px;opacity:1}
+@media(prefers-reduced-motion:reduce){.goal-chips li,.goal-chips li span{transition:none}}
