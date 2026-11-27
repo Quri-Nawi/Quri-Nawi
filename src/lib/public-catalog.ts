@@ -41,9 +41,10 @@ function validRecord(value: unknown): value is CatalogRecord {
 }
 
 export async function loadPublicCatalog(signal: AbortSignal): Promise<CatalogSnapshot> {
+  // Evita una respuesta de caché HTTP sin marca; el service worker conserva su respaldo.
   const [catalogResponse, sourcesResponse] = await Promise.all([
-    fetch("/api/catalogo", { signal }),
-    fetch("/api/fuentes", { signal }),
+    fetch("/api/catalogo", { signal, cache: "no-store" }),
+    fetch("/api/fuentes", { signal, cache: "no-store" }),
   ]);
   if (!catalogResponse.ok || !sourcesResponse.ok) throw new Error("No se pudo consultar el catálogo y sus fuentes.");
   const catalog: unknown = await catalogResponse.json();
@@ -64,12 +65,14 @@ export async function loadPublicCatalog(signal: AbortSignal): Promise<CatalogSna
     if (ids.has(record.id) || record.version !== catalog.version || record.sourceIds.some((id) => !links[id])) throw new Error("IDs o referencias del catálogo inválidos.");
     ids.add(record.id);
   }
+  // Algunos navegadores entregan la copia guardada sin X-Quri-Copy al recargar sin red.
+  const markedOffline = [catalogResponse, sourcesResponse].some((response) => response.headers.get("X-Quri-Copy") === "offline");
   return {
     records: catalog.records,
     sourceLinks: links,
     version: catalog.version,
     checked: catalog.checked,
     consultedAt: catalog.consultedAt,
-    copy: catalogResponse.headers.get("X-Quri-Copy") === "offline" || sourcesResponse.headers.get("X-Quri-Copy") === "offline" ? "offline" : "online",
+    copy: markedOffline || !navigator.onLine ? "offline" : "online",
   };
 }
