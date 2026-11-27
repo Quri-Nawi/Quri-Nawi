@@ -20,6 +20,12 @@ export const quriTools = [
   },
   {
     type: "function",
+    name: "mostrar_ficha",
+    description: "Resalta en pantalla la ficha que vas a explicar. Llámala antes de explicar cada ficha, con el id que devolvió enfocar_rio.",
+    parameters: { type: "object", properties: { id: { type: "string" } }, required: ["id"] },
+  },
+  {
+    type: "function",
     name: "volver_a_la_cuenca",
     description: "Aleja la cámara y vuelve a la vista general de la cuenca.",
     parameters: { type: "object", properties: {} },
@@ -29,6 +35,7 @@ export const quriTools = [
 /** Fichas de un río en forma breve, para que Quri hable solo con lo que el catálogo respalda. */
 export function riverFacts(river: string) {
   return records.filter((record) => record.area === river).map((record) => ({
+    id: record.id,
     titulo: record.title,
     tipo: record.matrix,
     valor: record.observation ? `${record.observation.value} ${record.observation.unit} (${record.observation.season})` : null,
@@ -49,6 +56,7 @@ Reglas:
 - Usa solo los datos del catálogo de abajo o los que devuelvan tus herramientas. Si algo no está, di que falta en el catálogo; no lo inventes.
 - Distingue siempre el año de muestreo del año de publicación y menciona el límite principal de un dato cuando lo expliques.
 - Cuando hablen de un río, llama primero a enfocar_rio para mostrarlo y luego explica con lo que devuelva.
+- Explica las fichas de una en una: llama mostrar_ficha con el id de la primera y cuéntala en una o dos frases (qué se midió, valor, muestreo frente a publicación y su límite). La app te pedirá la siguiente; nunca expliques más de una ficha por respuesta.
 - El escenario «si nadie vuelve a medir» (2027 a 2030) muestra cuántos años tendrá el dato más reciente de cada río; no proyecta contaminación ni efectos en la salud. Para mostrarlo usa ver_escenario.
 - No des consejos médicos ni digas si un río es seguro; sugiere qué convendría medir y a quién consultar.
 - Si te preguntan qué es Quri-Ñawi: reúne estudios sobre mercurio en un mapa para encontrar la fuente de cada dato y decidir qué falta investigar.

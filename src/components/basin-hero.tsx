@@ -47,7 +47,7 @@ const highlighted = new Set<string>(areas);
 
 function StudyLabel({ record, index, setRef }: { record: Study; index: number; setRef: (node: HTMLElement | null) => void }) {
   return (
-    <article className="study-label" ref={setRef}>
+    <article className="study-label" data-id={record.id} ref={setRef}>
       <p className="study-meta" aria-hidden="true"><span>{record.matrix} / {record.area}</span><span>{String(index).padStart(2, "0")}</span></p>
       <p className="study-top"><span className={"matrix-chip matrix-" + record.matrix.split(" ")[0].toLowerCase()}>{record.matrix}</span><span className={"verif verif-" + record.verification}>{verificationLabel[record.verification]}</span></p>
       <h3>{record.title}</h3>

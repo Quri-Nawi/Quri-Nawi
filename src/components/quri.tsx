@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { records } from "../lib/catalog";
 import { riverFacts } from "../lib/quri-brief";
 
 type Spot = "right" | "left";
@@ -20,11 +21,26 @@ function control(detail: { action: "river"; river: string } | { action: "year"; 
   document.querySelector(".basin-hero")?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+/** Quita el foco de Quri de fichas y líneas guía. */
+function clearSpotlight() {
+  document.querySelectorAll(".quri-focus").forEach((node) => node.classList.remove("quri-focus"));
+  document.querySelector(".study-columns")?.classList.remove("quri-explaining");
+}
+
 function runTool(name: string, args: Record<string, unknown>) {
+  if (name === "mostrar_ficha" && typeof args.id === "string") {
+    const record = records.find((item) => item.id === args.id);
+    if (!record) return { error: "No existe una ficha con ese id." };
+    window.dispatchEvent(new CustomEvent("quri:ficha", { detail: record.id }));
+    const fichas = riverFacts(record.area);
+    const index = fichas.findIndex((fact) => fact.id === record.id);
+    const siguiente = fichas[index + 1]?.id ?? null;
+    return { ficha: fichas[index], siguiente };
+  }
   if (name === "enfocar_rio" && typeof args.rio === "string") {
     control({ action: "river", river: args.rio });
     const fichas = riverFacts(args.rio);
-    return { rio: args.rio, fichas, nota: fichas.length ? "Explica con estas fichas." : "No hay fichas de este río en el catálogo." };
+    return { rio: args.rio, fichas, nota: fichas.length ? `Explica las fichas una por una: llama mostrar_ficha con "${fichas[0].id}".` : "No hay fichas de este río en el catálogo." };
   }
   if (name === "ver_escenario" && typeof args.anio === "number") {
     control({ action: "year", year: args.anio === 0 ? null : args.anio });
@@ -153,8 +169,36 @@ export function Quri() {
     return () => { cancelAnimationFrame(frame); sizer.disconnect(); window.removeEventListener("pointermove", onPointer); };
   }, []);
 
+  // Foco de Quri: la ficha se eleva y pulsa, las demás se atenúan, su línea al mapa se ilumina y Quri se pasa al lado contrario.
+  const spotlight = (label: HTMLElement) => {
+    if (label.classList.contains("quri-focus")) return;
+    clearSpotlight();
+    label.classList.add("quri-focus");
+    label.closest(".study-columns")?.classList.add("quri-explaining");
+    document.querySelector(`.basin-lines path[data-id="${label.dataset.id}"]`)?.classList.add("quri-focus");
+    if (window.matchMedia("(max-width: 760px)").matches) label.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    else setSpot(label.closest(".study-column.left") ? "right" : "left");
+  };
+
+  useEffect(() => {
+    let wait = 0;
+    const onFicha = (event: Event) => {
+      const id = (event as CustomEvent<string>).detail;
+      const find = () => document.querySelector<HTMLElement>(`.study-label[data-id="${id}"]`);
+      const label = find();
+      if (label) { spotlight(label); return; }
+      // Si su río no está abierto, primero lo abre y luego resalta la ficha.
+      const record = records.find((item) => item.id === id);
+      if (record) control({ action: "river", river: record.area });
+      window.clearTimeout(wait);
+      wait = window.setTimeout(() => { const late = find(); if (late) spotlight(late); }, 900);
+    };
+    window.addEventListener("quri:ficha", onFicha);
+    return () => { window.removeEventListener("quri:ficha", onFicha); window.clearTimeout(wait); };
+  });
+
   function stop(message?: string) {
-    document.querySelectorAll(".study-label.quri-focus").forEach((label) => label.classList.remove("quri-focus"));
+    clearSpotlight();
     const current = session.current;
     session.current = null;
     if (current) {
@@ -219,6 +263,8 @@ export function Quri() {
       pc.addTrack(voice, mic);
       const dc = pc.createDataChannel("oai-events");
       const send = (event: object) => { if (dc.readyState === "open") dc.send(JSON.stringify(event)); };
+      // Ritmo ficha por ficha: la app pide señalar una ficha, explicarla sin herramientas y recién entonces la siguiente.
+      let nextCard: string | null = null;
       dc.onopen = () => {
         setStatus("listening");
         send({ type: "response.create", response: { instructions: "Saluda en una sola frase como Quri y pregunta qué río quieren explorar." } });
@@ -228,18 +274,26 @@ export function Quri() {
         if (event.type === "response.created") setLines((current) => ({ ...current, quri: "" }));
         else if (event.type === "response.output_audio_transcript.delta" && event.delta) { setStatus("speaking"); setLines((current) => ({ ...current, quri: current.quri + event.delta })); }
         else if (event.type === "conversation.item.input_audio_transcription.completed" && event.transcript) setLines((current) => ({ ...current, user: event.transcript ?? "" }));
-        else if (event.type === "input_audio_buffer.speech_started") { setStatus("listening"); setLines({ quri: "", user: "…" }); }
+        else if (event.type === "input_audio_buffer.speech_started") { nextCard = null; setStatus("listening"); setLines({ quri: "", user: "…" }); }
         else if (event.type === "output_audio_buffer.started") setStatus("speaking");
         else if (event.type === "output_audio_buffer.stopped") setStatus("listening");
         else if (event.type === "response.done") {
           const calls = (event.response?.output ?? []).filter((item) => item.type === "function_call");
+          let showed = false;
           for (const call of calls) {
             let args: Record<string, unknown> = {};
             try { args = JSON.parse(call.arguments ?? "{}"); } catch { /* argumentos inválidos: la herramienta responde con error */ }
-            send({ type: "conversation.item.create", item: { type: "function_call_output", call_id: call.call_id, output: JSON.stringify(runTool(call.name ?? "", args)) } });
+            const result = runTool(call.name ?? "", args) as { siguiente?: string | null };
+            if (call.name === "mostrar_ficha" && "siguiente" in result) { showed = true; nextCard = result.siguiente ?? null; }
+            send({ type: "conversation.item.create", item: { type: "function_call_output", call_id: call.call_id, output: JSON.stringify(result) } });
           }
-          if (calls.length) send({ type: "response.create" });
-          else if (statusRef.current !== "speaking") setStatus("listening");
+          if (showed) send({ type: "response.create", response: { tool_choice: "none", instructions: nextCard ? "Explica en voz alta solo la ficha que acabas de mostrar, en una o dos frases." : "Explica en voz alta solo esta última ficha en una o dos frases y cierra con lo que falta medir en el río." } });
+          else if (calls.length) send({ type: "response.create" });
+          else if (nextCard) {
+            const id = nextCard;
+            nextCard = null;
+            send({ type: "response.create", response: { tool_choice: { type: "function", name: "mostrar_ficha" }, instructions: `Muestra la siguiente ficha: llama mostrar_ficha con "${id}".` } });
+          } else if (statusRef.current !== "speaking") setStatus("listening");
         }
       };
       const offer = await pc.createOffer();
@@ -271,10 +325,7 @@ export function Quri() {
       if (score > bestScore) { best = label; bestScore = score; }
     }
     if (!best || bestScore < 2) return;
-    document.querySelectorAll(".study-label.quri-focus").forEach((label) => label !== best && label.classList.remove("quri-focus"));
-    best.classList.add("quri-focus");
-    if (window.matchMedia("(max-width: 760px)").matches) best.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-    else setSpot(best.closest(".study-column.left") ? "right" : "left");
+    spotlight(best);
   }, [lines.quri]);
 
   const active = status === "connecting" || status === "listening" || status === "speaking";
