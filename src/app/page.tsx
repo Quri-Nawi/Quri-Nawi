@@ -6,6 +6,7 @@ import { Evidence } from "../components/evidence";
 import { Guide } from "../components/guide";
 import { InstallApp } from "../components/install-app";
 import { ProjectSections } from "../components/project-sections";
+import { Quri } from "../components/quri";
 import { records } from "../lib/catalog";
 import { sources } from "../lib/evidence";
 import { project } from "../lib/project";
@@ -31,6 +32,7 @@ export default function HomePage() {
       </header>
       <main id="contenido" tabIndex={-1}>
         <BasinHero />
+        <Quri />
         <div className="section-inner guide-strip"><p>¿Primera vez? Sigue el recorrido de tres pasos.</p><Guide /></div>
         <Atlas sourceLinks={sourceLinks} />
         <ProjectSections />
