@@ -653,3 +653,7 @@ h1,h2,h3,.brand span,.footer-inner strong,.measurement,.study-value,.river-tag,.
   .quri-text{font-size:12.5px;max-height:7.5em}
 }
 @media(prefers-reduced-motion:reduce){.quri-body,.quri-dock{transition:none;animation:none!important}.quri-bubble,.quri-ring{animation:none!important}}
+
+/* Ficha que Quri está explicando: se eleva y brilla en celeste */
+.study-label.quri-focus{border-color:#8fdcff;box-shadow:0 0 0 2px #8fdcff66,0 18px 44px #000a,0 0 34px #8fdcff40;transform:translateY(-4px)}
+.study-label.quri-focus:after{content:"Quri explica";position:absolute;top:-10px;right:14px;padding:2px 8px;border-radius:999px;background:#8fdcff;color:#0b211a;font:700 9.5px/1.4 var(--body);letter-spacing:.04em}

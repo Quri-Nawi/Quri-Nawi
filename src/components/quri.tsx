@@ -12,6 +12,7 @@ const SESSION_LIMIT_MS = 5 * 60 * 1000;
 const clamp = (x: number, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const smooth = (x: number) => { const t = clamp(x); return t * t * (3 - 2 * t); };
 const rad = (deg: number) => (deg * Math.PI) / 180;
+const normalize = (text: string) => text.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().replace(/(\d)[.,](\d)/g, "$1,$2").replace(/[^a-z0-9, ]+/g, " ").replace(/\s+/g, " ").trim();
 
 /** Pide al mapa 3D que cambie de río o de año; la portada escucha este evento. */
 function control(detail: { action: "river"; river: string } | { action: "year"; year: number | null } | { action: "home" }) {
@@ -52,7 +53,7 @@ export function Quri() {
     let greet = 0, hide = 0;
     // Saluda cuando el mapa 3D ya está listo; antes, la carga ocupa el navegador y el saludo pasaría sin verse.
     const onHero = () => {
-      setSpot(hero?.classList.contains("is-focused") ? "left" : "right");
+      if (!hero?.classList.contains("is-focused")) setSpot("right");
       if (!greet && hero?.getAttribute("data-status") !== "loading") {
         greet = window.setTimeout(() => { setHint(true); wave.current = performance.now() / 1000; }, 1200);
         hide = window.setTimeout(() => setHint(false), 9200);
@@ -110,8 +111,10 @@ export function Quri() {
       if (!ready || document.hidden) return;
       ctx.setTransform(canvas.width / 600, 0, 0, canvas.height / 650, 0, 0);
       ctx.clearRect(0, 0, 600, 650);
-      const talking = statusRef.current === "speaking";
-      open += ((talking ? clamp(level.current * 3.2) : 0) - open) * Math.min(1, dt * 18);
+      const talking = statusRef.current === "speaking" || level.current > 0.02;
+      // Si el navegador no entrega el volumen de la voz, la boca igual se mueve mientras Quri habla.
+      const voiced = level.current > 0.008 ? clamp(level.current * 3.2) : 0.15 + 0.6 * Math.abs(Math.sin(time * 10.7) * Math.cos(time * 3.3));
+      open += ((talking ? voiced : 0) - open) * Math.min(1, dt * 18);
       if (!reduced && time > nextBlink) { blinkAt = time; nextBlink = time + 2.6 + Math.random() * 3.4; }
       const blinkT = (time - blinkAt) / 0.24;
       const closure = blinkT >= 0 && blinkT < 1 ? Math.sin(Math.PI * blinkT) ** 1.5 : 0;
@@ -151,6 +154,7 @@ export function Quri() {
   }, []);
 
   function stop(message?: string) {
+    document.querySelectorAll(".study-label.quri-focus").forEach((label) => label.classList.remove("quri-focus"));
     const current = session.current;
     session.current = null;
     if (current) {
@@ -172,6 +176,7 @@ export function Quri() {
     wave.current = performance.now() / 1000;
     let mic: MediaStream;
     const ctx = new AudioContext();
+    ctx.resume().catch(() => undefined); // algunos celulares lo crean suspendido
     let voice: MediaStreamTrack;
     try {
       // Sin ganancia automática (subía ruidos lejanos) y con un filtro que quita zumbidos y golpes graves bajo 180 Hz.
@@ -224,6 +229,7 @@ export function Quri() {
         else if (event.type === "response.output_audio_transcript.delta" && event.delta) { setStatus("speaking"); setLines((current) => ({ ...current, quri: current.quri + event.delta })); }
         else if (event.type === "conversation.item.input_audio_transcription.completed" && event.transcript) setLines((current) => ({ ...current, user: event.transcript ?? "" }));
         else if (event.type === "input_audio_buffer.speech_started") { setStatus("listening"); setLines({ quri: "", user: "…" }); }
+        else if (event.type === "output_audio_buffer.started") setStatus("speaking");
         else if (event.type === "output_audio_buffer.stopped") setStatus("listening");
         else if (event.type === "response.done") {
           const calls = (event.response?.output ?? []).filter((item) => item.type === "function_call");
@@ -252,6 +258,24 @@ export function Quri() {
   }
 
   useEffect(() => () => stop(), []);
+
+  // Mientras explica, busca qué ficha menciona (valor o palabras del título), la resalta y se pasa al lado contrario para no taparla.
+  useEffect(() => {
+    if (!lines.quri) return;
+    const said = normalize(lines.quri.slice(-240));
+    let best: HTMLElement | null = null, bestScore = 0;
+    for (const label of document.querySelectorAll<HTMLElement>(".study-label")) {
+      const value = normalize(label.querySelector(".study-value")?.firstChild?.textContent ?? "");
+      const words = normalize(label.querySelector("h3")?.textContent ?? "").split(" ").filter((word) => word.length > 5);
+      const score = (value && said.includes(value) ? 3 : 0) + words.filter((word) => said.includes(word)).length;
+      if (score > bestScore) { best = label; bestScore = score; }
+    }
+    if (!best || bestScore < 2) return;
+    document.querySelectorAll(".study-label.quri-focus").forEach((label) => label !== best && label.classList.remove("quri-focus"));
+    best.classList.add("quri-focus");
+    if (window.matchMedia("(max-width: 760px)").matches) best.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    else setSpot(best.closest(".study-column.left") ? "right" : "left");
+  }, [lines.quri]);
 
   const active = status === "connecting" || status === "listening" || status === "speaking";
   const label = { idle: "Hablar con Quri", connecting: "Conectando con Quri", listening: "Quri te escucha", speaking: "Quri está hablando", error: "Hablar con Quri" }[status];
