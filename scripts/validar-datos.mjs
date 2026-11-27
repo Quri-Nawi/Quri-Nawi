@@ -3,6 +3,7 @@
 import { readFileSync } from "node:fs";
 import { records } from "../src/lib/catalog.ts";
 import { checkedOn, figureStatusLabel, figures, sources, summarize } from "../src/lib/evidence.ts";
+import { riverOutlook, sampleYear } from "../src/lib/outlook.ts";
 
 const fallos = [];
 const comprobar = (condicion, mensaje) => { if (!condicion) fallos.push(mensaje); };
@@ -85,6 +86,13 @@ for (const cifra of figures) {
 }
 
 comprobar(summarize().figures === figures.length && summarize().sources === sources.length, "summarize() no coincide con los datos.");
+
+// Escenario de antigüedad del dato: lectura de años y casos conocidos del catálogo
+comprobar(sampleYear("Jul–ago 2015") === 2015 && sampleYear("Estudios de 1997 a 2024") === 2024 && sampleYear("No indicada en la reseña") === null, "sampleYear no lee bien los años de muestreo.");
+const kaka2050 = riverOutlook(records, "Kaka", 2050);
+comprobar(kaka2050.newest === 1998 && kaka2050.age === 52 && kaka2050.level === "critico", "El escenario del Kaka en 2050 debería dar 52 años y nivel crítico.");
+comprobar(riverOutlook(records, "Mamoré", 2026).level === "sin-datos", "Un río sin fichas debería quedar sin datos.");
+comprobar(records.filter((r) => r.measures).every((r) => r.matrix !== "Proyecto"), "Una ficha de proyecto no puede contar como medición.");
 
 if (fallos.length) {
   console.error(`Datos inconsistentes (${fallos.length}):\n- ` + fallos.join("\n- "));
