@@ -40,7 +40,7 @@ const EXAGGERATION = 11 / 111_000; // unidades del mundo por metro: 1 unidad = 1
 const BASE = -0.16;
 const RIVER_LIFT = 0.017; // altura de los ríos sobre la malla para que las laderas no los tapen
 // Vista general desde el noreste: la llanura y los ríos delante, la cordillera al fondo.
-const OVERVIEW = { distance: 9.9, polar: 0.94, azimuth: 2.45 };
+const OVERVIEW = { distance: 9, polar: 0.94, azimuth: 2.45 };
 
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 
@@ -401,7 +401,7 @@ export function createBasinScene(options: SceneOptions): BasinScene {
     renderer.setSize(width, height, false);
     camera.aspect = width / Math.max(height, 1);
     // En pantallas verticales la maqueta necesita más distancia para caber.
-    camera.fov = camera.aspect < 0.8 ? 52 : 36;
+    camera.fov = camera.aspect < 0.8 ? 47 : 34;
     Object.assign(shift, shiftGoal());
     applyShift();
   };
