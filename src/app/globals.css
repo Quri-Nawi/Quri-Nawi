@@ -323,3 +323,46 @@ dialog p{font-size:14px;margin:9px 0}
 .figure-table small{display:block;color:var(--muted);font-weight:500;margin-top:2px;overflow-wrap:anywhere}
 .evidence-links{display:flex;gap:12px;flex-wrap:wrap}
 @media(max-width:720px){.evidence{padding-block:33px}.evidence-stats{grid-template-columns:1fr 1fr}}
+
+/* Escenario «si nadie vuelve a medir» */
+.basin-hero{--lv-reciente:#6ee7a0;--lv-envejece:#ffd36b;--lv-antiguo:#ff8a3d;--lv-critico:#ff3b30;--lv-sin-datos:#9a93b5}
+.level-reciente{--lv:var(--lv-reciente)}.level-envejece{--lv:var(--lv-envejece)}.level-antiguo{--lv:var(--lv-antiguo)}.level-critico{--lv:var(--lv-critico)}.level-sin-datos{--lv:var(--lv-sin-datos)}
+.outlook-bar{position:absolute;z-index:4;top:92px;left:50%;translate:-50% 0;display:flex;align-items:center;gap:4px;padding:5px 5px 5px 14px;border-radius:999px;background:#0b211ad9;border:1px solid #ff3b3055;box-shadow:0 10px 30px #0007;backdrop-filter:blur(6px)}
+.outlook-bar span{margin-right:6px;font-size:11px;font-weight:750;letter-spacing:.08em;text-transform:uppercase;color:#ffb4a8}
+.outlook-bar button{min-height:34px;padding:6px 14px;border:0;border-radius:999px;background:transparent;color:#f1e9e2;font:700 13px/1 var(--display)}
+.outlook-bar button:hover{background:#ffffff1a}
+.outlook-bar button[aria-pressed=true]{background:#ff3b30;color:#fff8f2;box-shadow:0 0 18px #ff3b3088}
+.basin-intro.is-outlook{max-width:520px}
+.basin-intro.is-outlook .eyebrow{color:#ff8a7a}
+.basin-intro.is-outlook h1{font-size:clamp(30px,3.4vw,50px)}
+.basin-intro.is-outlook h1 em{color:#ff6a5c}
+.priority-list{list-style:none;display:grid;gap:6px;margin:14px 0 0;padding:0}
+.priority-list li{display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:baseline;padding:7px 11px;border-radius:8px;background:#0b211acc;border-left:4px solid var(--lv);font-size:12px;color:#dce8dd}
+.priority-list strong{font:700 14px/1.2 var(--display);color:#fff8e6}
+.priority-list small{grid-column:1/-1;font-size:11px;color:#b9c9bd}
+.goal-chips{list-style:none;display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 0;padding:0}
+.goal-chips li{display:inline-flex;align-items:center;gap:6px;padding:4px 9px 4px 4px;border-radius:999px;background:#0b211acc;border:1px solid var(--goal,#9ab);font-size:11px;color:#e7efe6}
+.goal-chips b{padding:2px 7px;border-radius:999px;background:var(--goal,#5b6);color:#fff;font-size:10px;letter-spacing:.03em}
+.goal-chips .minamata{--goal:#0a97d9}
+.river-tag .age{margin-left:2px;padding:2px 7px;border-radius:999px;background:var(--lv);color:#170d0b;font:800 10px/1 var(--body);font-style:normal}
+.river-tag[class*=level-]{color:#fff1ea;border-color:var(--lv)}
+.river-tag.level-critico{box-shadow:0 0 14px #ff3b3077}
+.basin-legend .legend-title{font-weight:750;color:#fff1ea}
+.basin-legend .legend-level{width:18px;height:6px;background:var(--lv);box-shadow:0 0 6px var(--lv)}
+.basin-legend .legend-note{font-size:10px;color:#a9bdb0}
+.outlook-lines{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0;padding:0}
+.outlook-lines li{display:grid;gap:2px;padding:6px 9px;border-radius:7px;background:#ffffff0d;border-top:3px solid var(--lv);font-size:10px;color:#b9c9bd}
+.outlook-lines span{text-transform:uppercase;letter-spacing:.06em;font-weight:750}
+.outlook-lines strong{font-size:13px;color:#fff4e8}
+@media(max-width:760px){
+  .outlook-bar{top:104px;left:12px;translate:none;padding-left:10px}
+  .outlook-bar span{font-size:9px;margin-right:2px;max-width:76px;line-height:1.15}
+  .outlook-bar button{padding:6px 10px;font-size:12px}
+  .basin-intro.is-outlook>p:not(.eyebrow),.priority-list small{display:none}
+  .basin-intro.is-outlook h1{font-size:clamp(24px,7vw,32px);margin:6px 0 8px}
+  .priority-list{gap:4px;margin-top:6px}
+  .priority-list li{padding:5px 9px}
+  .goal-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}
+  .goal-chips li{flex:none}
+  .outlook-lines{grid-template-columns:1fr}
+}
