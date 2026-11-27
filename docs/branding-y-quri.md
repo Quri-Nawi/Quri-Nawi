@@ -85,8 +85,9 @@ Referencias oficiales: [Documentación TTS](https://elevenlabs.io/docs/overview/
   - `madre-de-dios-v1`: ~475 caracteres
   - **Total de los 3 ríos con fichas:** **~1.605 caracteres** (~16 % de la cuota mensual gratuita con `eleven_multilingual_v2`, o ~8 % usando `eleven_flash_v2_5` a 0,5 créditos/carácter).
 - **Reutilización por versión:**
-  1. Se incluye `scripts/generar-audios-quri.mjs` para pre-generar archivos MP3 estáticos en `public/audio/quri-<rio>-v1.mp3` una sola vez por versión revisada del guion (consumo cero en visitas posteriores y soporte directo en despliegue estático/PWA).
-  2. La ruta `/api/quri-tts` reutiliza primero el MP3 versionado en `public/audio/` y, si se genera bajo demanda con API, guarda caché en memoria y disco (`.next/cache/quri-tts/`) indexada por `id + version + voz + modelo`.
+  1. Los audios revisados `v1` ya están pre-generados y versionados en `public/audio/` (`quri-kaka-v1.mp3`, `quri-beni-v1.mp3`, `quri-madre-de-dios-v1.mp3`) usando voz neural en español de Bolivia (`es-BO-SofiaNeural`, ~177–223 KB cada uno) para garantizar reproducción instantánea, de alta calidad y compatible con la PWA sin conexión.
+  2. Si el equipo desea reemplazarlos con voz de ElevenLabs usando los créditos del plan gratuito/comercial, se incluye `scripts/generar-audios-quri.mjs` (`npm run tts:generate`) que genera los mismos archivos versionados una sola vez.
+  3. La ruta `/api/quri-tts` reutiliza primero el MP3 versionado en `public/audio/` y, si se genera bajo demanda con API de ElevenLabs, guarda caché en memoria y disco (`.next/cache/quri-tts/`) indexada por `id + version + voz + modelo`.
 
 ### Condiciones de licencia y atribución aplicables
 

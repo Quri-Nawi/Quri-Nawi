@@ -28,6 +28,7 @@ export type BasinScene = {
   focus: (river: string | null) => void;
   zoom: (factor: number) => void;
   setRotation: (on: boolean) => void;
+  setNarrating: (on: boolean) => void;
   dispose: () => void;
 };
 
@@ -232,11 +233,16 @@ export function createBasinScene(options: SceneOptions): BasinScene {
 
   let rotating = !options.reducedMotion;
   let focused: string | null = null;
+  let narrating = false;
   let idleTimer = 0;
+  const syncAutoRotate = () => {
+    controls.autoRotate = !options.reducedMotion && (narrating || (rotating && !focused));
+    controls.autoRotateSpeed = narrating ? 0.55 : 0.45;
+  };
   controls.addEventListener("start", () => { controls.autoRotate = false; window.clearTimeout(idleTimer); });
   controls.addEventListener("end", () => {
     window.clearTimeout(idleTimer);
-    idleTimer = window.setTimeout(() => { controls.autoRotate = rotating && !focused; }, 5000);
+    idleTimer = window.setTimeout(syncAutoRotate, 5000);
   });
 
   const spherical = (distance: number, polar: number, azimuth: number, target: THREE.Vector3) =>
@@ -262,7 +268,7 @@ export function createBasinScene(options: SceneOptions): BasinScene {
   controls.target.copy(home);
   flyTo(home, OVERVIEW.distance, OVERVIEW.polar, 2600);
   controls.autoRotate = false;
-  const introDone = window.setTimeout(() => { controls.autoRotate = rotating && !focused; }, options.reducedMotion ? 0 : 2600);
+  const introDone = window.setTimeout(syncAutoRotate, options.reducedMotion ? 0 : 2600);
 
   const setOpacity = () => {
     for (const river of rivers.values()) {
@@ -381,14 +387,15 @@ export function createBasinScene(options: SceneOptions): BasinScene {
   return {
     focus(name) {
       focused = name && rivers.has(name) ? name : null;
+      narrating = false;
       setOpacity();
       window.clearTimeout(idleTimer);
       if (!focused) {
         flyTo(home, OVERVIEW.distance, OVERVIEW.polar);
-        controls.autoRotate = rotating;
+        syncAutoRotate();
         return;
       }
-      controls.autoRotate = false;
+      syncAutoRotate();
       const box = rivers.get(focused)!.box;
       const center = box.getCenter(new THREE.Vector3());
       const size = box.getSize(new THREE.Vector3());
@@ -401,7 +408,12 @@ export function createBasinScene(options: SceneOptions): BasinScene {
     },
     setRotation(on) {
       rotating = on && !options.reducedMotion;
-      controls.autoRotate = rotating && !focused;
+      syncAutoRotate();
+    },
+    setNarrating(on) {
+      narrating = on && !options.reducedMotion;
+      window.clearTimeout(idleTimer);
+      syncAutoRotate();
     },
     dispose() {
       cancelAnimationFrame(frame);

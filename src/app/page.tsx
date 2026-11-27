@@ -5,6 +5,7 @@ import { Contribution } from "../components/contribution";
 import { Guide } from "../components/guide";
 import { InstallApp } from "../components/install-app";
 import { ProjectSections } from "../components/project-sections";
+import { QuriCompanion } from "../components/quri-companion";
 import { project } from "../lib/project";
 
 export default function HomePage() {
@@ -40,6 +41,7 @@ export default function HomePage() {
           </a>
         </div>
       </footer>
+      <QuriCompanion />
     </>
   );
 }

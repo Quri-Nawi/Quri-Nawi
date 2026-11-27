@@ -19,15 +19,15 @@ let memoryUsedChars = 0;
 const CACHE_DIR = path.join(process.cwd(), ".next", "cache", "quri-tts");
 const QUOTA_FILE = path.join(CACHE_DIR, "quota.json");
 
-function audioResponse(bytes: Uint8Array, source: string, commercialPlan: boolean): Response {
+function audioResponse(bytes: Uint8Array, source: string, attribution: string | null): Response {
   const headers: Record<string, string> = {
     "Content-Type": "audio/mpeg",
     "Content-Length": String(bytes.byteLength),
     "Cache-Control": "public, max-age=31536000, immutable",
     "X-Quri-Audio-Source": source,
   };
-  if (!commercialPlan) {
-    headers["X-Quri-Attribution"] = "elevenlabs.io";
+  if (attribution) {
+    headers["X-Quri-Attribution"] = attribution;
   }
   return new Response(Uint8Array.from(bytes), { status: 200, headers });
 }
@@ -83,6 +83,7 @@ export async function GET(request: Request) {
   }
 
   const commercialPlan = process.env.ELEVENLABS_PLAN_COMMERCIAL === "true";
+  const elevenLabsCredit = commercialPlan ? null : "elevenlabs.io";
 
   // 1. Reutilizar audio estático pre-generado por versión en public/audio/ si existe.
   if (script.staticAudioPath) {
@@ -90,7 +91,7 @@ export async function GET(request: Request) {
     try {
       const fileBuffer = await readFile(staticFile);
       if (fileBuffer.byteLength > 0) {
-        return audioResponse(new Uint8Array(fileBuffer), "static-versioned", commercialPlan);
+        return audioResponse(new Uint8Array(fileBuffer), "static-versioned", null);
       }
     } catch {
       // No existe aún el MP3 pre-generado; continuar con caché o síntesis en servidor.
@@ -107,7 +108,7 @@ export async function GET(request: Request) {
   // 2. Caché en memoria y disco por versión del guion.
   const inMemory = memoryCache.get(cacheKey);
   if (inMemory) {
-    return audioResponse(inMemory, "memory-cache", commercialPlan);
+    return audioResponse(inMemory, "memory-cache", elevenLabsCredit);
   }
 
   const diskCacheFile = path.join(CACHE_DIR, `${script.id}-${cacheKey}.mp3`);
@@ -116,7 +117,7 @@ export async function GET(request: Request) {
     if (cachedBuffer.byteLength > 0) {
       const bytes = new Uint8Array(cachedBuffer);
       memoryCache.set(cacheKey, bytes);
-      return audioResponse(bytes, "disk-cache", commercialPlan);
+      return audioResponse(bytes, "disk-cache", elevenLabsCredit);
     }
   } catch {
     // Sin entrada previa en disco.
@@ -190,7 +191,7 @@ export async function GET(request: Request) {
       // Si el disco es de solo lectura, la caché en memoria sigue activa.
     }
 
-    return audioResponse(bytes, "elevenlabs-live", commercialPlan);
+    return audioResponse(bytes, "elevenlabs-live", elevenLabsCredit);
   } catch {
     return Response.json(
       { error: "tts_network_failure", fallback: "text" },

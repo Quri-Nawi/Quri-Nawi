@@ -5,17 +5,8 @@ import { areas, records, type Record as Study } from "../lib/catalog";
 import type { BasinScene, Geo } from "./basin-scene";
 import { QuriAssistant } from "./quri-assistant";
 
-const checked = ["agua", "sedimentos", "peces"];
 const studiesOf = (river: string) => records.filter((record) => record.area === river);
 const plural = (count: number) => (count === 1 ? "1 ficha" : count + " fichas");
-
-function gapText(river: string) {
-  const present = new Set(studiesOf(river).map((record) => record.matrix.toLowerCase()));
-  const missing = checked.filter((matrix) => !present.has(matrix)).map((matrix) => "de " + matrix);
-  if (missing.length === 0) return "";
-  const list = missing.length === 1 ? missing[0] : missing.slice(0, -1).join(", ") + " ni " + missing[missing.length - 1];
-  return `Faltan fichas en este catálogo ${list} para este río.`;
-}
 
 const anchors = records.flatMap((record) => record.places.map((place) => ({ id: record.id, lon: place.lon, lat: place.lat })));
 const highlighted = new Set<string>(areas);
@@ -137,6 +128,7 @@ export function BasinHero() {
   useEffect(() => {
     selectedRef.current = selected;
     sceneRef.current?.focus(selected);
+    window.dispatchEvent(new CustomEvent("quri:river-selected", { detail: selected }));
     const url = new URL(window.location.href);
     if (selected) url.searchParams.set("rio", selected); else url.searchParams.delete("rio");
     if (url.href !== window.location.href) window.history.replaceState(null, "", url);
@@ -227,17 +219,15 @@ export function BasinHero() {
             </div>
           ))}
         </div>
-        <div className="river-panel" role="region" aria-label={"Río " + selected}>
-          <p className="eyebrow">{studies.length ? plural(studies.length) + " en el catálogo" : "Faltan fichas en este catálogo"}</p>
-          <h2>Río {selected}</h2>
-          <p>{studies.length ? gapText(selected) : "Faltan fichas en este catálogo para este río. ¿Conoces un estudio? Propónlo para revisión."}</p>
-          <QuriAssistant river={selected} theme="dark" />
-          <div className="basin-actions">
-            <button className="button gold" type="button" onClick={() => setSelected(null)}>← Volver a la cuenca</button>
-            {studies.length ? <button className="button ghost" type="button" onClick={() => showInList(selected)}>Ver en la lista ↓</button>
-              : <a className="button ghost" href="#aportar">Proponer un estudio ↓</a>}
-          </div>
-        </div>
+        <QuriAssistant
+          layout="river-panel"
+          river={selected}
+          theme="dark"
+          studyCount={studies.length}
+          onBack={() => setSelected(null)}
+          onShowInList={() => showInList(selected)}
+          onSpeakingChange={(speaking) => sceneRef.current?.setNarrating(speaking)}
+        />
       </>}
     </section>
   );
