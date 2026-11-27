@@ -1,3 +1,6 @@
+import publications from "./publications.json" with { type: "json" };
+import { publicPublications } from "./review.ts";
+
 export type Area = "Beni" | "Kaka" | "Madre de Dios";
 export type Matrix = "Sedimentos" | "Peces" | "Datos agregados" | "Proyecto";
 
@@ -63,7 +66,7 @@ const cedibLimits = [
 export const areas: readonly Area[] = ["Beni", "Kaka", "Madre de Dios"];
 export const matrices: readonly Matrix[] = ["Sedimentos", "Peces", "Datos agregados", "Proyecto"];
 
-export const records: readonly Record[] = [
+export const seedRecords: readonly Record[] = [
   {
     id: "kaka-seca",
     measures: "ambiente",
@@ -349,3 +352,7 @@ export const records: readonly Record[] = [
     places: [],
   },
 ];
+
+/** Semillas documentales visibles; no equivalen a aprobación institucional. */
+export const reviewedPublications = publicPublications(publications);
+export const records: readonly Record[] = [...seedRecords, ...reviewedPublications.map(item => item.record)];

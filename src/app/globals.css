@@ -366,3 +366,5 @@ dialog p{font-size:14px;margin:9px 0}
   .goal-chips li{flex:none}
   .outlook-lines{grid-template-columns:1fr}
 }
+
+.drafts li{flex-wrap:wrap}.drafts li>div:first-child{flex:1 1 180px}

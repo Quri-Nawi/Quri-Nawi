@@ -311,3 +311,9 @@ Trabaja en una rama desde `main`, limita el cambio a una sección y abre una sol
 ## Revisión del 26 de noviembre
 
 [Observaciones y resolución](docs/observaciones-26-nov.md) · [Guion de pitch en PDF](docs/pitch/guion-pitch.pdf) · [Guion editable](docs/pitch/guion-pitch.md) · [Protocolo de validación](docs/protocolo-validacion-usuarios.md).
+
+## Propuestas y publicación revisada
+
+Los borradores permiten descargar un expediente para revisión por PR. El envío de referencias a la cola D1 existente se habilita con `QURI_PROPOSALS_ENABLED=1`; conserva el borrador si falla y muestra el ID únicamente tras confirmación. No necesita token administrativo. [Contrato, procedimiento de revisión, publicación y límites](docs/revision-publicacion.md). Las semillas documentales conservan revisión institucional pendiente; aceptar en la cola no publica una ficha.
+
+La [verificación reproducible de la demo](docs/verificacion/demo-automatizada.md) incluye pruebas de producción con Chromium, capturas desktop/móvil, modo offline y recuperación WebGL. Ejecuta `npm test` y `npm run test:browser` además de `npm run check`.

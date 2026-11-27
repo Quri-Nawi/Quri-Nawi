@@ -14,7 +14,7 @@
     "typecheck": "next typegen && tsc --noEmit",
     "check": "npm run datos && npm run lint && npm run typecheck && npm run build",
     "smoke": "node scripts/smoke.mjs",
-    "datos": "node --no-warnings scripts/validar-datos.mjs",
+    "datos": "node --no-warnings scripts/validar-datos.mjs && node --no-warnings scripts/validar-publicaciones.mjs",
     "test:browser": "playwright test",
     "test": "node --test tests/*.test.mjs"
   },

@@ -19,6 +19,9 @@ test('catálogo, filtros, comparación, aporte y respaldo offline', async ({ pag
   await page.locator('#aportar select[name=territory]').selectOption('Kaka');
   await page.getByRole('button', { name: /Guardar borrador/ }).click();
   await expect(page.locator('.drafts')).toContainText('Prueba local de la demo');
+  await page.getByRole('button', { name: 'Enviar a revisión' }).click();
+  await expect(page.locator('.form-feedback')).toContainText('Conserva el borrador');
+  await expect(page.locator('.drafts')).toContainText('Borrador local');
   await page.getByRole('button', { name: /Instalar app/ }).click();
   await expect(page.getByRole('dialog')).toContainText('preparado para consulta sin conexión');
   await page.getByRole('button', { name: 'Cerrar instalación' }).click();
