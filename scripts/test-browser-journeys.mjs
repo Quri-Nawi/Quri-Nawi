@@ -45,6 +45,11 @@ async function inspect() {
       url: location.href,
       map: document.querySelector('.basin-hero')?.dataset.status,
       api: document.querySelector('.catalog-provenance')?.textContent?.includes('Consulta de la web revisada'),
+      offline: document.querySelector('.catalog-provenance')?.textContent?.includes('Copia sin conexión'),
+      copyDateVisible: document.querySelector('.catalog-provenance')?.textContent?.includes('copia obtenida'),
+      controlled: Boolean(navigator.serviceWorker?.controller),
+      online: navigator.onLine,
+      catalogVisible: document.querySelector('.atlas-side')?.textContent?.includes('kaka-seca'),
       panel: document.querySelector('.river-panel')?.getAttribute('aria-label'),
       study: document.querySelector('.study-columns')?.textContent?.includes('kaka-seca')
     })`,
@@ -100,6 +105,39 @@ try {
   assert.equal(state.panel, "Río Kaka", "el panel del río debe seguir abierto tras actualizar el catálogo");
   assert.equal(state.study, true, "el panel debe mostrar la ficha del catálogo actualizado");
   console.log("Enlace /?rio=Kaka verificado tras cargar las API: URL, panel y ficha kaka-seca conservados.");
+
+  const workerDeadline = Date.now() + 15_000;
+  while (!state.controlled && Date.now() < workerDeadline) {
+    await pause(200);
+    state = await inspect();
+  }
+  assert.equal(state.controlled, true, "el service worker debe controlar la página antes de desconectar");
+  await command("Network.enable");
+  await command("Network.emulateNetworkConditions", {
+    offline: true, latency: 0, downloadThroughput: 0, uploadThroughput: 0,
+  });
+  await command("Page.reload");
+  const offlineDeadline = Date.now() + 20_000;
+  while (Date.now() < offlineDeadline) {
+    try { state = await inspect(); }
+    catch (error) { if (!/context|frame|navigation/i.test(error.message)) throw error; }
+    if (state?.online === false && state?.offline && state?.catalogVisible) break;
+    await pause(200);
+  }
+  assert.equal(state.online, false, `Chrome debe estar sin conexión: ${JSON.stringify(state)}`);
+  assert.equal(state.offline, true, `la procedencia visible debe indicar copia sin conexión: ${JSON.stringify(state)}`);
+  assert.equal(state.catalogVisible, true, "el catálogo guardado debe seguir visible");
+  assert.equal(state.copyDateVisible, true, "la copia debe mostrar su fecha de consulta");
+  const { result: offlineCopies } = await command("Runtime.evaluate", {
+    expression: `Promise.all(['/api/catalogo', '/api/fuentes'].map(async (route) => {
+      const response = await fetch(route, { cache: 'no-store' });
+      return response.status;
+    }))`,
+    awaitPromise: true,
+    returnByValue: true,
+  });
+  assert.deepEqual(offlineCopies.value, [200, 200], "ambas API deben responder con la copia disponible");
+  console.log("Recarga sin red verificada: catálogo disponible y etiqueta «Copia sin conexión».");
 } finally {
   if (socket?.readyState === WebSocket.OPEN) {
     try { await command("Browser.close"); } catch { /* Chrome puede cerrarse antes de responder. */ }
