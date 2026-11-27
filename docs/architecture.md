@@ -14,6 +14,7 @@ La primera versión usa el App Router de Next.js con TypeScript y npm. La portad
 | `src/lib/evidence.ts` | Fuentes y cifras con estado y redacción segura. Espejo de `docs/fuentes/*.csv`: `npm run datos` falla si difieren. |
 | `src/components/evidence.tsx` | Sección «Respaldo» de la portada. |
 | `src/components/basin-hero.tsx` | Portada 3D: etiquetas de estudios, líneas guía, panel del río, chips y controles accesibles. |
+| `src/lib/outlook.ts` | Escenario «si nadie vuelve a medir»: antigüedad del dato más reciente por río y por línea de evidencia (agua y sedimentos, peces, personas). Lo valida `npm run datos`. |
 | `src/components/basin-scene.ts` | Escena Three.js: relieve real, ríos, marcadores, giro automático, zoom al río y clic por *raycasting*. Se carga aparte para no frenar la portada. |
 | `src/components` | Atlas esquemático, comparación, borradores locales, guía, instalación y secciones. |
 | `public/sw.js` | Caché de la vista principal y de sus recursos públicos. |
@@ -46,3 +47,11 @@ La primera versión usa el App Router de Next.js con TypeScript y npm. La portad
 - Frontera: Natural Earth (dominio público).
 - Los marcadores usan la ubicación aproximada de cada ficha y muestran su precisión. Un mercado de compra no se presenta como sitio de captura.
 - Sin WebGL, o con movimiento reducido, la portada sigue siendo usable: el giro se detiene y la vista 2D y la lista responden la misma pregunta.
+
+## Escenario «si nadie vuelve a medir»
+
+- Usa solo las fichas que traen una medición de mercurio (`measures` en `catalog.ts`) y el año de muestreo; no usa el año de publicación.
+- Antigüedad = año elegido − año de la medición más reciente del río. Niveles: hasta 5 años, 6 a 10, 11 a 20 y más de 20. Son un criterio del equipo para priorizar dónde medir, no un umbral científico.
+- No proyecta concentraciones, tendencias ni efectos en salud. Esas proyecciones necesitan series de medición y un modelo revisado por especialistas.
+- Los ODS mostrados (3, 6, 12 y 15) y el Convenio de Minamata indican a qué compromisos aporta cada tipo de evidencia; no son metas medidas por la app.
+

@@ -71,6 +71,17 @@ La aplicación ya cubre el recorrido de consulta: explorar la cuenca, abrir la f
     </td>
   </tr>
   <tr>
+    <td><img src="docs/assets/escenario-2050.jpg" alt="Escenario 2050 en la maqueta 3D: ríos coloreados por antigüedad del dato, el Kaka en rojo con «1998 · 52 años» y la lista de dónde medir primero"></td>
+    <td>
+      <h3>⏳ Hoy, 2030 y 2050: si nadie vuelve a medir</h3>
+      El selector superior cambia el mapa de <b>hoy</b> a un escenario futuro. Cada río toma el color de la <b>antigüedad de su medición de mercurio más reciente</b> en el catálogo y los más críticos laten en rojo.
+      <br><br>
+      No proyecta niveles de contaminación: muestra dónde la evidencia envejece y qué conviene medir primero. El Kaka pasa de 28 años hoy a 52 en 2050; el Beni y el Madre de Dios, de 2 a 26.
+      <br><br>
+      Cada línea de evidencia se vincula con los ODS 3, 6, 12 y 15 y con el Convenio de Minamata. Enlace directo: <code>/?escenario=2050</code>.
+    </td>
+  </tr>
+  <tr>
     <td><img src="docs/assets/atlas.jpg" alt="Atlas de la cuenca del Beni con los ríos Kaka, Beni y Madre de Dios y la lista filtrable de fichas"></td>
     <td>
       <h3>🗺️ Vista 2D y lista</h3>
