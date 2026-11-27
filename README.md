@@ -71,14 +71,14 @@ La aplicación ya cubre el recorrido de consulta: explorar la cuenca, abrir la f
     </td>
   </tr>
   <tr>
-    <td><img src="docs/assets/escenario-2050.jpg" alt="Escenario 2050 en la maqueta 3D: ríos coloreados por antigüedad del dato, el Kaka en rojo con «1998 · 52 años» y la lista de dónde medir primero"></td>
+    <td><img src="docs/assets/escenario-2030.jpg" alt="Escenario 2030 en la maqueta 3D: ríos coloreados por antigüedad del dato, bruma rojiza, el Kaka con «1998 · 32 años» y tarjetas de alerta con contador y curva"></td>
     <td>
-      <h3>⏳ Hoy, 2030 y 2050: si nadie vuelve a medir</h3>
-      El selector superior cambia el mapa de <b>hoy</b> a un escenario futuro. Cada río toma el color de la <b>antigüedad de su medición de mercurio más reciente</b> en el catálogo y los más críticos laten en rojo.
+      <h3>⏳ Hoy, 2027, 2028, 2029 y 2030: si nadie vuelve a medir</h3>
+      La línea de tiempo superior avanza año a año. Cada río toma un color continuo según la <b>antigüedad de su medición de mercurio más reciente</b> en el catálogo; el terreno se tiñe, crece una bruma y los marcadores de estudio se apagan. Los ríos más críticos laten en rojo.
       <br><br>
-      No proyecta niveles de contaminación: muestra dónde la evidencia envejece y qué conviene medir primero. El Kaka pasa de 28 años hoy a 52 en 2050; el Beni y el Madre de Dios, de 2 a 26.
+      No proyecta niveles de contaminación: muestra dónde la evidencia envejece y qué conviene medir primero. El Kaka pasa de 28 años hoy a 32 en 2030; el Beni y el Madre de Dios, de 2 a 6. Las alertas son tarjetas con contador, curva y una señal por línea de evidencia: al tocarlas, la cámara va al río.
       <br><br>
-      Cada línea de evidencia se vincula con los ODS 3, 6, 12 y 15 y con el Convenio de Minamata. Enlace directo: <code>/?escenario=2050</code>.
+      Cada línea de evidencia se vincula con los ODS 3, 6, 12 y 15 y con el Convenio de Minamata. Enlace directo: <code>/?escenario=2030</code>.
     </td>
   </tr>
   <tr>
@@ -300,7 +300,7 @@ Trabaja en una rama desde `main`, limita el cambio a una sección y abre una sol
 - 🏆 [Gold for Good Hackathon](https://gold4good.info.bo/site/). Su logo aparece en el pie de la app como crédito a la hackathon.
 - 🗺️ Ríos © colaboradores de [OpenStreetMap](https://www.openstreetmap.org/copyright) (ODbL). Relieve: [Terrain Tiles](https://registry.opendata.aws/terrain-tiles/) de Mapzen en AWS Open Data (SRTM, GMTED, ETOPO1). Imagen: Sentinel-2 cloudless 2016, [EOxCloudless](https://cloudless.eox.at) de EOX IT Services GmbH (contiene datos Copernicus Sentinel modificados 2016), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); color y sombreado modificados, tono igualado a NASA Blue Marble. Frontera: Natural Earth.
 - 🎨 El logo de Quri-Ñawi se generó con ImageGen. Los detalles están en [docs/architecture.md](docs/architecture.md#créditos-de-imagen).
-- 🔤 Tipografías Inter y Space Grotesk, con licencia SIL Open Font License 1.1.
+- 🔤 Títulos en Bargain (Hamzstudio · Sensatype; uso sujeto a la licencia del equipo). Texto en Inter y Space Grotesk como respaldo, con licencia SIL Open Font License 1.1.
 
 ---
 

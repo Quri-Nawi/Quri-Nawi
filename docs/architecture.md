@@ -51,6 +51,7 @@ La primera versión usa el App Router de Next.js con TypeScript y npm. La portad
 ## Escenario «si nadie vuelve a medir»
 
 - Usa solo las fichas que traen una medición de mercurio (`measures` en `catalog.ts`) y el año de muestreo; no usa el año de publicación.
+- Años: hoy (2026), 2027, 2028, 2029 y 2030. Cada año cambia el color continuo de los ríos (`ageColor`), el tono del terreno, la bruma y la opacidad de los marcadores.
 - Antigüedad = año elegido − año de la medición más reciente del río. Niveles: hasta 5 años, 6 a 10, 11 a 20 y más de 20. Son un criterio del equipo para priorizar dónde medir, no un umbral científico.
 - No proyecta concentraciones, tendencias ni efectos en salud. Esas proyecciones necesitan series de medición y un modelo revisado por especialistas.
 - Los ODS mostrados (3, 6, 12 y 15) y el Convenio de Minamata indican a qué compromisos aporta cada tipo de evidencia; no son metas medidas por la app.
@@ -59,3 +60,9 @@ La primera versión usa el App Router de Next.js con TypeScript y npm. La portad
 ## Propuestas y extracción revisable
 
 El [contrato de revisión y publicación](revision-publicacion.md) documenta `POST /api/propuestas`, el envío opcional a la cola D1 existente y el manifiesto de publicaciones revisadas. El [piloto de extracción](extraccion-revisable.md) procesa PDF/TXT localmente, conserva respaldo y correcciones por campo y entrega un expediente pendiente al mismo flujo. La autenticación y revisión administrativa continúan a cargo del procedimiento por PR y del MCP; no se expone un token administrativo al cliente.
+
+## Tipografía y piezas animadas
+
+- Títulos, marca y cifras usan Bargain (`public/fonts/bargain.woff`, convertido del OTF del equipo). Es de Hamzstudio · Sensatype con todos los derechos reservados: el uso web depende de la licencia del equipo. No incluye µ ni flechas; el navegador las toma de la fuente de respaldo.
+- `src/components/motion-bits.tsx` reúne el contador, la curva y los puntos escalonados de las alertas. Las secciones Método y Escala usan tarjetas con animaciones CSS. Todo se detiene con «reducir movimiento».
+
