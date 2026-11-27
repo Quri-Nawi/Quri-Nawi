@@ -443,3 +443,33 @@ h1,h2,h3,.brand span,.footer-inner strong,.measurement,.study-value,.river-tag,.
 @keyframes value-rise{from{opacity:0;transform:translateY(8px)}}
 .study-dates dt{font-family:ui-monospace,Consolas,monospace}
 @media(prefers-reduced-motion:reduce){.study-label,.study-label .study-value{transition:none;animation:none}}
+
+/* Tarjetas responsivas: tablet con columnas más angostas; celular con carruseles y la línea de tiempo a lo ancho */
+@media(min-width:761px) and (max-width:1100px){
+  .basin-intro.is-outlook{max-width:min(440px,52vw)}
+  .alert-age{font-size:22px}
+  .spark{width:70px}
+}
+@media(max-width:760px){
+  .outlook-bar{right:12px;justify-content:space-between;padding:4px 6px}
+  .outlook-years{flex:1;justify-content:space-between}
+  .outlook-bar button{padding:6px 8px}
+  .is-outlook ~ .basin-tools,.basin-hero:has(.is-outlook) .basin-tools{top:162px}
+  .priority-list{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:4px;margin-inline:-4px;padding-inline:4px}
+  .priority-list li{flex:0 0 min(78%,260px);padding:0;scroll-snap-align:start}
+  .alert-card{padding:8px 10px 8px 12px}
+  .alert-age{font-size:22px}
+  .alert-go{display:none}
+  .study-label{border-radius:14px}
+  .study-meta{font-size:9px}
+}
+@media(max-width:420px){
+  .outlook-bar>span{display:none}
+  .outlook-bar button{padding:6px 7px;font-size:11px}
+}
+@media(max-width:360px){
+  .study-label{flex-basis:88%}
+  .priority-list li{flex-basis:86%}
+  .spark{display:none}
+  .alert-card{grid-template-columns:1fr}
+}
