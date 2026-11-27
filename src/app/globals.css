@@ -392,3 +392,13 @@ dialog p{font-size:14px;margin:9px 0}
 @media(max-width:760px){.extraction-columns{grid-template-columns:1fr}.extraction pre{max-height:230px}}
 /* Bargain es la tipografía de títulos: un solo peso y espaciado propio, así que no se fuerza negrita ni se aprieta tanto */
 h1,h2,h3,.brand span,.footer-inner strong,.measurement,.study-value,.river-tag,.river-hover strong,.priority-list strong{font-weight:400;letter-spacing:-.012em;font-synthesis:none}
+
+/* Línea de tiempo del escenario: el relleno avanza de verde a rojo hasta el año elegido */
+.outlook-years{position:relative;display:flex;gap:2px}
+.outlook-years:before,.outlook-fill{content:"";position:absolute;left:20px;top:50%;height:2px;margin-top:-1px;border-radius:2px;pointer-events:none}
+.outlook-years:before{right:20px;background:#ffffff26}
+.outlook-fill{width:calc((100% - 40px) * var(--progress,0));background:linear-gradient(90deg,#6ee7a0,#ffd36b 45%,#ff8a3d 70%,#ff3b30);box-shadow:0 0 10px #ff8a3d88;transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.outlook-years button{position:relative;z-index:1;background:#0d231c;transition:background .25s,transform .25s,box-shadow .25s}
+.outlook-years button:hover{transform:translateY(-1px)}
+.outlook-years button[aria-pressed=true]{transform:scale(1.06)}
+@media(prefers-reduced-motion:reduce){.outlook-fill,.outlook-years button{transition:none}}

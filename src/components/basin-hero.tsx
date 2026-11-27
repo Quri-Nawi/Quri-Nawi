@@ -246,11 +246,14 @@ export function BasinHero() {
         <strong>Río {hover.river}</strong>{studiesOf(hover.river).length ? plural(studiesOf(hover.river).length) + " · clic para acercar" : "Sin fichas en el catálogo · clic para ver"}
       </p>}
 
-      <div className="outlook-bar" role="group" aria-label="Escenario: si nadie vuelve a medir">
+      <div className="outlook-bar" role="group" aria-label="Escenario: si nadie vuelve a medir" style={{ ["--progress" as string]: year === null ? 0 : outlookYears.indexOf(year) / (outlookYears.length - 1) }}>
         <span>Si nadie vuelve a medir</span>
-        {outlookYears.map((option) => (
-          <button key={option} type="button" aria-pressed={year === option} onClick={() => setYear(year === option ? null : option)} disabled={status !== "ready"}>{option === 2026 ? "Hoy" : option}</button>
-        ))}
+        <div className="outlook-years">
+          <i className="outlook-fill" aria-hidden="true" />
+          {outlookYears.map((option) => (
+            <button key={option} type="button" aria-pressed={year === option} onClick={() => setYear(year === option ? null : option)} disabled={status !== "ready"}>{option === 2026 ? "Hoy" : option}</button>
+          ))}
+        </div>
       </div>
 
       <div className={"basin-intro" + (year !== null ? " is-outlook" : "")}>
