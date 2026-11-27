@@ -14,6 +14,7 @@
     "typecheck": "next typegen && tsc --noEmit",
     "check": "npm run datos && npm run lint && npm run typecheck && npm run build",
     "smoke": "node scripts/smoke.mjs",
+    "smoke:river": "node scripts/test-rio-direct-link.mjs",
     "smoke:offline": "node scripts/test-sw-offline.mjs",
     "datos": "node --no-warnings scripts/validar-datos.mjs"
   },

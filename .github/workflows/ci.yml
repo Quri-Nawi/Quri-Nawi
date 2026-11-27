@@ -37,6 +37,7 @@ jobs:
             sleep 1
           done
           npm run smoke
+          npm run smoke:river
           kill "$servidor"
       - name: Registro del servidor
         if: failure()
