@@ -1,5 +1,5 @@
 /* global self, caches, fetch, URL, Response */
-const CACHE = "quri-nawi-public-v5";
+const CACHE = "quri-nawi-public-v6";
 const shellFiles = [
   "/manifest.webmanifest",
   "/brand/quri-nawi.png",
@@ -27,7 +27,8 @@ self.addEventListener("install", (event) => {
     const chunks = [...html.matchAll(/(?:src|href)="(\/_next\/static\/[^"]+)"/g)].map((match) => match[1]);
     await cache.addAll([...new Set([...shellFiles, ...chunks])]);
     await cache.put("/", home);
-    await Promise.allSettled(dataRoutes.map((route) => cache.add(route)));
+    // No se anuncia preparación offline hasta tener también ambas API públicas.
+    await cache.addAll(dataRoutes);
     await self.skipWaiting();
   })());
 });
@@ -35,7 +36,7 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil((async () => {
     for (const key of await caches.keys()) {
-      if (key !== CACHE) await caches.delete(key);
+      if (key.startsWith("quri-nawi-public-") && key !== CACHE) await caches.delete(key);
     }
     await self.clients.claim();
   })());

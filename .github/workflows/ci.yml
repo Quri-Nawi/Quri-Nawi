@@ -28,6 +28,16 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm run check
       - run: npm audit --audit-level=low
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: navegador-produccion
+          path: |
+            playwright-report/
+            test-results/
       - name: Prueba de humo con la compilación de producción
         run: |
           npm start > servidor.log 2>&1 &

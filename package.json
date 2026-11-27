@@ -14,7 +14,9 @@
     "typecheck": "next typegen && tsc --noEmit",
     "check": "npm run datos && npm run lint && npm run typecheck && npm run build",
     "smoke": "node scripts/smoke.mjs",
-    "datos": "node --no-warnings scripts/validar-datos.mjs"
+    "datos": "node --no-warnings scripts/validar-datos.mjs",
+    "test:browser": "playwright test",
+    "test": "node --test tests/*.test.mjs"
   },
   "dependencies": {
     "next": "16.4.6",
@@ -23,6 +25,7 @@
     "three": "0.187.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.65.1",
     "@types/node": "24.19.4",
     "@types/react": "19.3.3",
     "@types/react-dom": "19.3.0",
