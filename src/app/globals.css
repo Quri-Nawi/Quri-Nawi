@@ -1,10 +1,13 @@
 @font-face{font-family:Inter;src:url("/fonts/inter.woff2") format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:Bargain;src:url("/fonts/bargain.woff") format("woff");font-weight:400;font-display:swap}
+/* Las reglas de títulos traían el espaciado apretado de Space Grotesk; Bargain se lee mejor casi sin apretar */
+:root :is(.basin-intro h1,.section-head h2,.contribute h2,.insight h2,.river-panel h2,.compare-heading h2,.dialog-head h2,.record h3,.tool-card h3,.study-label h3,.alert-head strong,.alert-age,.measurement,.study-value,.viz-count strong,.brand span,.footer-inner strong){letter-spacing:-.008em}
 @font-face{font-family:Space;src:url("/fonts/space-grotesk.woff2") format("woff2");font-weight:300 700;font-display:swap}
 :root{
   color-scheme:light;
   --paper:#f7f5ed;--surface:#fffdf6;--forest:#183b31;--dark:#132e26;--ink:#202e27;
   --muted:#4c6155;--mint:#dcead9;--line:#d7ddce;--gold:#d6b66a;--gold-dark:#875a1c;
-  --display:Space,ui-sans-serif,system-ui;--body:Inter,ui-sans-serif,system-ui;
+  --display:Bargain,Space,ui-sans-serif,system-ui;--body:Inter,ui-sans-serif,system-ui;
   color:var(--ink);background:var(--paper);font-family:var(--body);
 }
 *{box-sizing:border-box}
@@ -387,3 +390,5 @@ dialog p{font-size:14px;margin:9px 0}
 .extraction .extraction-permission{display:flex;align-items:flex-start;font-size:12px;line-height:1.5}
 .extraction-permission input{width:auto;flex-shrink:0;margin-top:3px}
 @media(max-width:760px){.extraction-columns{grid-template-columns:1fr}.extraction pre{max-height:230px}}
+/* Bargain es la tipografía de títulos: un solo peso y espaciado propio, así que no se fuerza negrita ni se aprieta tanto */
+h1,h2,h3,.brand span,.footer-inner strong,.measurement,.study-value,.river-tag,.river-hover strong,.priority-list strong{font-weight:400;letter-spacing:-.012em;font-synthesis:none}
