@@ -10,6 +10,7 @@ export function InstallApp() {
   const [available, setAvailable] = useState<InstallEvent | null>(null);
   const [installed, setInstalled] = useState(false);
   const [offlineReady, setOfflineReady] = useState(false);
+  const [updated, setUpdated] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -25,13 +26,21 @@ export function InstallApp() {
     };
     window.addEventListener("beforeinstallprompt", registerPrompt);
     window.addEventListener("appinstalled", markInstalled);
+    // La app instalada puede quedar abierta días: al volver a primer plano busca una versión nueva y ofrece recargar.
+    const hadController = "serviceWorker" in navigator && Boolean(navigator.serviceWorker.controller);
+    const onNewVersion = () => { if (hadController) setUpdated(true); };
+    const checkUpdate = () => { if (document.visibilityState === "visible") navigator.serviceWorker?.getRegistration().then((registration) => registration?.update()).catch(() => undefined); };
     if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") {
+      navigator.serviceWorker.addEventListener("controllerchange", onNewVersion);
+      document.addEventListener("visibilitychange", checkUpdate);
       navigator.serviceWorker.register("/sw.js")
         .then(() => navigator.serviceWorker.ready)
         .then(() => setOfflineReady(true))
         .catch(() => setOfflineReady(false));
     }
     return () => {
+      navigator.serviceWorker?.removeEventListener("controllerchange", onNewVersion);
+      document.removeEventListener("visibilitychange", checkUpdate);
       window.removeEventListener("beforeinstallprompt", registerPrompt);
       window.removeEventListener("appinstalled", markInstalled);
     };
@@ -53,6 +62,7 @@ export function InstallApp() {
   }
 
   return <>
+    {updated && <p className="update-toast" role="status">Hay una versión nueva de Quri-Ñawi. <button type="button" onClick={() => window.location.reload()}>Actualizar</button></p>}
     <button className="install-button" type="button" onClick={install}><span aria-hidden="true">↓</span> {installed ? "App instalada" : "Instalar app"}</button>
     <dialog ref={dialog} aria-labelledby="install-title">
       <div className="dialog-head"><h2 id="install-title">Instalar Quri-Ñawi</h2><form method="dialog"><button type="submit" aria-label="Cerrar instalación">×</button></form></div>
