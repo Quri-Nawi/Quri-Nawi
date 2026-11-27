@@ -32,7 +32,7 @@ export type BasinScene = {
   setRotation: (on: boolean) => void;
   setTexture: (texture: THREE.Texture) => void;
   /** Escenario «si nadie vuelve a medir»: color por río, alertas pulsantes y tono del terreno; null vuelve al mapa normal. */
-  setOutlook: (outlook: { colors: ReadonlyMap<string, number>; alerts: ReadonlySet<string>; tint: number } | null) => void;
+  setOutlook: (outlook: { colors: ReadonlyMap<string, number>; alerts: ReadonlySet<string>; tint: number; fade: number } | null) => void;
   dispose: () => void;
 };
 
@@ -241,6 +241,7 @@ export function createBasinScene(options: SceneOptions): BasinScene {
 
   // Marcadores: haz de luz sobre el lugar aproximado de cada estudio.
   const pins: { ring: THREE.Mesh; phase: number }[] = [];
+  const pinMaterials: THREE.MeshBasicMaterial[] = [];
   const seen = new Set<string>();
   for (const anchor of options.anchors) {
     const key = anchor.lon.toFixed(3) + anchor.lat.toFixed(3);
@@ -255,6 +256,8 @@ export function createBasinScene(options: SceneOptions): BasinScene {
     ring.rotateX(-Math.PI / 2);
     ring.position.copy(base);
     scene.add(beam, head, ring);
+    pinMaterials.push(beam.material, head.material);
+    head.material.transparent = true;
     pins.push({ ring, phase: pins.length * 0.7 });
   }
 
@@ -479,6 +482,10 @@ export function createBasinScene(options: SceneOptions): BasinScene {
         alerts.get(river.name)!.visible = Boolean(outlook?.alerts.has(river.name));
       }
       groundMaterial.color.setHex(outlook?.tint ?? 0xffffff);
+      // fade 0→1 según el año: crece una bruma rojiza y los marcadores de estudio se apagan, como evidencia que envejece.
+      const fade = outlook?.fade ?? 0;
+      scene.fog = fade > 0 ? new THREE.FogExp2(0x3a1712, 0.012 + 0.05 * fade) : null;
+      for (const material of pinMaterials) material.opacity = 1 - 0.75 * fade;
       flow.visible = !outlook; // la corriente dorada significa «tiene fichas»; en el escenario manda el color por antigüedad
     },
     setRotation(on) {

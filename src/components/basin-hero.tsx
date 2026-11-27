@@ -92,6 +92,7 @@ export function BasinHero() {
       colors: new Map([...outlooks].map(([name, outlook]) => [name, ageColor(outlook.age)])),
       alerts: new Set([...outlooks].filter(([, outlook]) => outlook.level === "critico").map(([name]) => name)),
       tint: yearTint[year],
+      fade: (year - 2026) / 4,
     });
   }, [status, year, outlooks]);
 
