@@ -268,7 +268,15 @@ export function BasinHero() {
           <ol className="priority-list" aria-label="Dónde medir primero">
             {[...areas].sort((a, b) => (outlooks.get(b)?.age ?? 999) - (outlooks.get(a)?.age ?? 999)).map((river) => {
               const outlook = outlooks.get(river);
-              return <li key={river} className={"level-" + outlook?.level}><strong>Río {river}</strong>{outlook?.newest ? "último dato " + outlook.newest + " · " + outlook.age + " años" : "sin datos"}{outlook?.missing.length ? <small>Falta: {joinList(outlook.missing)}</small> : null}</li>;
+              const index = String([...areas].sort((a, b) => (outlooks.get(b)?.age ?? 999) - (outlooks.get(a)?.age ?? 999)).indexOf(river) + 1).padStart(2, "0");
+              return <li key={river} className={"level-" + outlook?.level} style={{ ["--lv" as string]: cssColor(ageColor(outlook?.age ?? null)), ["--i" as string]: Number(index) }}>
+                <button type="button" className="alert-card" onClick={() => setSelected(river)} aria-label={"Acercarse al río " + river + (outlook?.newest ? ": último dato " + outlook.newest + ", " + outlook.age + " años" : ": sin datos")}>
+                  <span className="alert-head"><strong>Río {river}</strong><span className="alert-index">{index}</span></span>
+                  <span className="alert-age">{outlook?.newest ? <>{outlook.age}<small>años · dato de {outlook.newest}</small></> : <small>sin datos</small>}</span>
+                  {outlook?.missing.length ? <span className="alert-missing">Falta: {joinList(outlook.missing)}</span> : null}
+                  <span className="alert-go" aria-hidden="true">Ver río ↗</span>
+                </button>
+              </li>;
             })}
           </ol>
           <Goals />
