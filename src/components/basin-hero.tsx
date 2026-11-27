@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { areas, records, verificationLabel, type Record as Study } from "../lib/catalog";
 import type { BasinScene, Geo } from "./basin-scene";
 import { placeLabels, type Tag } from "./label-layout";
+import { Counter, Dots, Spark } from "./motion-bits";
 import { ageColor, cssColor, levelLabel, outlookYears, riverOutlook, type Level, type OutlookYear } from "../lib/outlook";
 
 const checked = ["agua", "sedimentos", "peces"];
@@ -272,7 +273,9 @@ export function BasinHero() {
               return <li key={river} className={"level-" + outlook?.level} style={{ ["--lv" as string]: cssColor(ageColor(outlook?.age ?? null)), ["--i" as string]: Number(index) }}>
                 <button type="button" className="alert-card" onClick={() => setSelected(river)} aria-label={"Acercarse al río " + river + (outlook?.newest ? ": último dato " + outlook.newest + ", " + outlook.age + " años" : ": sin datos")}>
                   <span className="alert-head"><strong>Río {river}</strong><span className="alert-index">{index}</span></span>
-                  <span className="alert-age">{outlook?.newest ? <>{outlook.age}<small>años · dato de {outlook.newest}</small></> : <small>sin datos</small>}</span>
+                  <span className="alert-age">{outlook?.newest ? <><Counter value={outlook.age ?? 0} /><small>años · dato de {outlook.newest}</small></> : <small>sin datos</small>}</span>
+                  {outlook?.newest ? <Spark values={outlookYears.map((option) => option - (outlook.newest ?? option))} current={outlookYears.indexOf(year)} /> : null}
+                  <Dots items={outlook?.latest.map((line) => ({ label: line.label + (line.year === null ? ": sin dato" : ": " + line.year), color: cssColor(ageColor(line.year === null ? null : year - line.year)) })) ?? []} />
                   {outlook?.missing.length ? <span className="alert-missing">Falta: {joinList(outlook.missing)}</span> : null}
                   <span className="alert-go" aria-hidden="true">Ver río ↗</span>
                 </button>
