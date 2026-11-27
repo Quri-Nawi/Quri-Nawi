@@ -183,6 +183,25 @@ export function createBasinScene(options: SceneOptions): BasinScene {
   }
 
   // Ríos: núcleo, halo y un tubo invisible más ancho para que el clic sea fácil.
+  // Agua en movimiento: crestas de luz y ondas finas que avanzan aguas abajo dentro de cada cauce.
+  const flowTime = { value: 0 };
+  const flowing = (material: THREE.MeshBasicMaterial, strength: number) => {
+    material.onBeforeCompile = (shader) => {
+      shader.uniforms.uFlow = flowTime;
+      shader.vertexShader = shader.vertexShader
+        .replace("#include <common>", "#include <common>\nvarying float vRun;")
+        .replace("#include <begin_vertex>", "#include <begin_vertex>\nvRun = uv.x;");
+      shader.fragmentShader = shader.fragmentShader
+        .replace("#include <common>", "#include <common>\nvarying float vRun;\nuniform float uFlow;")
+        .replace("#include <opaque_fragment>", `
+          float wave = fract(vRun * 7.0 - uFlow * 0.8);
+          float crest = smoothstep(0.0, 0.12, wave) * (1.0 - smoothstep(0.12, 0.42, wave));
+          float ripple = 0.5 + 0.5 * sin(vRun * 160.0 - uFlow * 7.0);
+          outgoingLight = outgoingLight * (0.78 + 0.12 * ripple) + vec3(1.0, 0.97, 0.88) * crest * ${strength.toFixed(2)};
+          #include <opaque_fragment>`);
+    };
+  };
+
   type River = { name: string; core: THREE.MeshBasicMaterial; glow: THREE.MeshBasicMaterial; curves: THREE.CatmullRomCurve3[]; box: THREE.Box3; featured: boolean };
   const rivers = new Map<string, River>();
   const hits: THREE.Mesh[] = [];
@@ -191,6 +210,8 @@ export function createBasinScene(options: SceneOptions): BasinScene {
     const featured = highlighted.has(river.name);
     const core = new THREE.MeshBasicMaterial({ color: featured ? 0xffd36b : 0x8fdcff, transparent: true, opacity: 1 });
     const glow = new THREE.MeshBasicMaterial({ color: featured ? 0xffb938 : 0x58c4ff, transparent: true, opacity: featured ? 0.28 : 0.16, blending: THREE.AdditiveBlending, depthWrite: false });
+    flowing(core, featured ? 0.75 : 0.55);
+    flowing(glow, 0.35);
     const entry: River = { name: river.name, core, glow, curves: [], box: new THREE.Box3(), featured };
     for (const segment of river.segments) {
       const points: THREE.Vector3[] = [];
@@ -203,8 +224,19 @@ export function createBasinScene(options: SceneOptions): BasinScene {
       points.push(world(lastLon, lastLat, RIVER_LIFT));
       const curve = new THREE.CatmullRomCurve3(points);
       const detail = Math.min(points.length * 2, 1600);
-      scene.add(new THREE.Mesh(new THREE.TubeGeometry(curve, detail, featured ? 0.0075 : 0.0055, 6), core));
-      scene.add(new THREE.Mesh(new THREE.TubeGeometry(curve, detail, featured ? 0.017 : 0.012, 6), glow));
+      // La corriente va hacia el extremo más bajo; si empatan, hacia el norte, donde la cuenca drena al Madeira.
+      const [firstLon, firstLat] = segment[0];
+      const drop = demHeight(firstLon, firstLat) - demHeight(lastLon, lastLat);
+      const downstream = Math.abs(drop) > 15 ? drop > 0 : lastLat > firstLat;
+      const length = curve.getLength();
+      const tube = (radius: number) => {
+        const geometry = new THREE.TubeGeometry(curve, detail, radius, 6);
+        const uv = geometry.attributes.uv as THREE.BufferAttribute;
+        for (let i = 0; i < uv.count; i++) uv.setX(i, (downstream ? uv.getX(i) : 1 - uv.getX(i)) * length);
+        return geometry;
+      };
+      scene.add(new THREE.Mesh(tube(featured ? 0.0075 : 0.0055), core));
+      scene.add(new THREE.Mesh(tube(featured ? 0.017 : 0.012), glow));
       const hit = new THREE.Mesh(new THREE.TubeGeometry(curve, Math.min(points.length, 500), 0.055, 5), hitMaterial);
       hit.userData.river = river.name;
       hits.push(hit);
@@ -410,6 +442,7 @@ export function createBasinScene(options: SceneOptions): BasinScene {
       if (t === 1) tween = null;
     }
     controls.update(delta);
+    if (!options.reducedMotion) flowTime.value += delta;
     const goal = shiftGoal();
     if (Math.abs(goal.x - shift.x) + Math.abs(goal.y - shift.y) > 0.0005) {
       const k = options.reducedMotion ? 1 : Math.min(delta * 3, 1);
