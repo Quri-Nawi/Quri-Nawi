@@ -21,7 +21,8 @@ function gapText(river: string) {
 }
 
 const levelColor: { readonly [K in Level]: number } = { reciente: 0x6ee7a0, envejece: 0xffd36b, antiguo: 0xff8a3d, critico: 0xff3b30, "sin-datos": 0x9a93b5 };
-const yearTint: { readonly [K in OutlookYear]: number } = { 2026: 0xffffff, 2030: 0xf0d0c2, 2050: 0xdba293 };
+// Cada año tiñe un poco más el terreno: el mismo río se lee distinto en 2027 y en 2030.
+const yearTint: { readonly [K in OutlookYear]: number } = { 2026: 0xffffff, 2027: 0xf7e9e2, 2028: 0xefd6cb, 2029: 0xe6c0b2, 2030: 0xdba597 };
 // Colores oficiales de los ODS de la ONU; Minamata es el convenio sobre mercurio del que Bolivia es parte.
 const goals = [
   { id: "3", name: "Salud y bienestar", why: "exposición de las personas", color: "#4c9f38" },

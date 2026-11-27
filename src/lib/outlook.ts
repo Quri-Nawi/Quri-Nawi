@@ -4,7 +4,7 @@ import type { Record } from "./catalog";
  * Escenario «si nadie vuelve a medir»: no proyecta niveles de mercurio.
  * Calcula cuántos años tendrá el dato más reciente de cada río en un año dado, con las fichas del catálogo.
  */
-export const outlookYears = [2026, 2030, 2050] as const;
+export const outlookYears = [2026, 2027, 2028, 2029, 2030] as const;
 export type OutlookYear = (typeof outlookYears)[number];
 export type Level = "reciente" | "envejece" | "antiguo" | "critico" | "sin-datos";
 

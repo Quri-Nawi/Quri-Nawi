@@ -92,6 +92,7 @@ comprobar(sampleYear("Jul–ago 2015") === 2015 && sampleYear("Estudios de 1997 
 const kaka2050 = riverOutlook(records, "Kaka", 2050);
 comprobar(kaka2050.newest === 1998 && kaka2050.age === 52 && kaka2050.level === "critico", "El escenario del Kaka en 2050 debería dar 52 años y nivel crítico.");
 comprobar(riverOutlook(records, "Mamoré", 2026).level === "sin-datos", "Un río sin fichas debería quedar sin datos.");
+comprobar(riverOutlook(records, "Kaka", 2030).age === 32 && riverOutlook(records, "Beni", 2027).age === 3, "Antigüedad del Kaka en 2030 o del Beni en 2027 inesperada.");
 comprobar(records.filter((r) => r.measures).every((r) => r.matrix !== "Proyecto"), "Una ficha de proyecto no puede contar como medición.");
 
 if (fallos.length) {
