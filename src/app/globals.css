@@ -670,3 +670,14 @@ h1,h2,h3,.brand span,.footer-inner strong,.measurement,.study-value,.river-tag,.
   .quri-dock:is([data-status=connecting],[data-status=listening],[data-status=speaking]) .quri-bubble{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;animation:none}
 }
 @media(prefers-reduced-motion:reduce){.quri-close{animation:none}}
+
+/* Quri explicando ficha por ficha: la elegida pulsa en celeste, aparece aunque estuviera oculta y las demás se atenúan */
+.study-label{transition:transform .4s,box-shadow .4s,border-color .4s,opacity .4s,filter .4s}
+.study-columns.quri-explaining .study-label:not(.quri-focus){opacity:.42;filter:saturate(.5);transform:scale(.97)}
+.study-label.quri-focus{animation:quri-glow 1.6s ease-in-out infinite}
+@keyframes quri-glow{50%{box-shadow:0 0 0 3px #8fdcffaa,0 18px 44px #000a,0 0 48px #8fdcff70}}
+@media(min-width:761px){.study-column .study-label.quri-focus:nth-child(n){display:block}}
+.basin-lines path.quri-focus{stroke:#8fdcff;stroke-width:2.6;stroke-dasharray:none;filter:drop-shadow(0 0 6px #8fdcff)}
+@media(prefers-reduced-motion:reduce){.study-label.quri-focus{animation:none}}
+/* En escritorio, la columna de la ficha que Quri explica muestra solo esa ficha: no se desborda al aparecer una oculta */
+@media(min-width:761px){.study-columns.quri-explaining .study-column:has(.quri-focus) .study-label:not(.quri-focus){display:none}}
