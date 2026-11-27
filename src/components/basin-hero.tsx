@@ -36,8 +36,8 @@ const ageLevel = (age: number): Level => (age <= 5 ? "reciente" : age <= 10 ? "e
 function Goals() {
   return (
     <ul className="goal-chips" aria-label="Objetivos que apoya esta evidencia">
-      {goals.map((goal) => <li key={goal.id} style={{ ["--goal" as string]: goal.color }} title={goal.name + ": " + goal.why}><b>ODS {goal.id}</b>{goal.name}</li>)}
-      <li className="minamata" title="Convenio de Minamata sobre el Mercurio, del que Bolivia es parte"><b>Minamata</b>Convenio sobre el mercurio</li>
+      {goals.map((goal) => <li key={goal.id} style={{ ["--goal" as string]: goal.color }} title={goal.name + ": " + goal.why}><b>ODS {goal.id}</b><span>{goal.name}</span></li>)}
+      <li className="minamata" title="Convenio de Minamata sobre el Mercurio, del que Bolivia es parte"><b>Minamata</b><span>Convenio sobre el mercurio</span></li>
     </ul>
   );
 }
