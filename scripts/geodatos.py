@@ -2,7 +2,7 @@
 
 - relieve.bin: elevación en metros (Uint16, little-endian), rejilla lon/lat de ANCHO x ALTO.
   Fuente: Terrain Tiles de Mapzen en AWS Open Data (SRTM, GMTED, ETOPO1).
-- satelite.jpg: NASA Blue Marble Next Generation vía GIBS (dominio público).
+- Las texturas (satelite.jpg, satelite-hd.jpg, normales.jpg) se generan con scripts/terreno_hd.py.
 - rios.json: ríos de OpenStreetMap (ODbL) vía Nominatim, frontera de Natural Earth (dominio público) y ciudades.
 
 Uso: python scripts/geodatos.py   (requiere numpy y pillow; descarga datos públicos).
@@ -58,46 +58,50 @@ def fetch(url, retries=4):
             time.sleep(2 ** attempt)
 
 
-def tile_xy(lon, lat):
-    n = 2 ** ZOOM
+def tile_xy(lon, lat, zoom=ZOOM):
+    n = 2 ** zoom
     x = (lon + 180) / 360 * n
     y = (1 - math.asinh(math.tan(math.radians(lat))) / math.pi) / 2 * n
     return x, y
 
 
-def build_relief():
-    x0, y0 = tile_xy(WEST, NORTH)
-    x1, y1 = tile_xy(EAST, SOUTH)
+def elevation_grid(width, height, zoom, cache=None):
+    """Elevación en metros sobre una rejilla lon/lat, interpolada desde teselas Terrarium."""
+    x0, y0 = tile_xy(WEST, NORTH, zoom)
+    x1, y1 = tile_xy(EAST, SOUTH, zoom)
     tx = range(int(x0), int(x1) + 1)
     ty = range(int(y0), int(y1) + 1)
     mosaic = np.zeros((len(ty) * 256, len(tx) * 256), dtype=np.float32)
     for j, y in enumerate(ty):
         for i, x in enumerate(tx):
-            png = fetch(f"https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{ZOOM}/{x}/{y}.png")
+            path = cache and os.path.join(cache, f"{zoom}-{x}-{y}.png")
+            if path and os.path.exists(path):
+                with open(path, "rb") as file:
+                    png = file.read()
+            else:
+                png = fetch(f"https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{zoom}/{x}/{y}.png")
+                if path:
+                    os.makedirs(cache, exist_ok=True)
+                    with open(path, "wb") as file:
+                        file.write(png)
             rgb = np.asarray(Image.open(io.BytesIO(png)).convert("RGB")).astype(np.float32)
             mosaic[j * 256:(j + 1) * 256, i * 256:(i + 1) * 256] = rgb[..., 0] * 256 + rgb[..., 1] + rgb[..., 2] / 256 - 32768
-    lons = WEST + (np.arange(WIDTH) + 0.5) / WIDTH * (EAST - WEST)
-    lats = NORTH - (np.arange(HEIGHT) + 0.5) / HEIGHT * (NORTH - SOUTH)
-    px = (np.array([tile_xy(lon, 0)[0] for lon in lons]) - tx.start) * 256
-    py = (np.array([tile_xy(WEST, lat)[1] for lat in lats]) - ty.start) * 256
+    lons = WEST + (np.arange(width) + 0.5) / width * (EAST - WEST)
+    lats = NORTH - (np.arange(height) + 0.5) / height * (NORTH - SOUTH)
+    px = (np.array([tile_xy(lon, 0, zoom)[0] for lon in lons]) - tx.start) * 256
+    py = (np.array([tile_xy(WEST, lat, zoom)[1] for lat in lats]) - ty.start) * 256
     gx, gy = np.meshgrid(px, py)
     ix, iy = np.clip(gx.astype(int), 0, mosaic.shape[1] - 2), np.clip(gy.astype(int), 0, mosaic.shape[0] - 2)
     fx, fy = gx - ix, gy - iy
     top = mosaic[iy, ix] * (1 - fx) + mosaic[iy, ix + 1] * fx
     bottom = mosaic[iy + 1, ix] * (1 - fx) + mosaic[iy + 1, ix + 1] * fx
-    elevation = np.clip(top * (1 - fy) + bottom * fy, 0, 65535).astype("<u2")
+    return np.clip(top * (1 - fy) + bottom * fy, 0, 65535)
+
+
+def build_relief():
+    elevation = elevation_grid(WIDTH, HEIGHT, ZOOM).astype("<u2")
     elevation.tofile(os.path.join(OUT, "relieve.bin"))
     return int(elevation.min()), int(elevation.max())
-
-
-def build_satellite():
-    query = urllib.parse.urlencode({
-        "SERVICE": "WMS", "REQUEST": "GetMap", "VERSION": "1.3.0", "LAYERS": "BlueMarble_NextGeneration",
-        "STYLES": "", "CRS": "EPSG:4326", "BBOX": f"{SOUTH},{WEST},{NORTH},{EAST}",
-        "WIDTH": 2048, "HEIGHT": 2268, "FORMAT": "image/jpeg",
-    })
-    image = Image.open(io.BytesIO(fetch("https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?" + query))).convert("RGB")
-    image.save(os.path.join(OUT, "satelite.jpg"), quality=84, optimize=True, progressive=True)
 
 
 def simplify(points, tolerance):
@@ -148,7 +152,7 @@ def build_rivers():
         "rivers": rivers,
         "border": border,
         "places": [{"name": name, "lon": lon, "lat": lat} for name, (lon, lat) in PLACES.items()],
-        "credits": "Ríos © colaboradores de OpenStreetMap (ODbL). Frontera: Natural Earth. Relieve: Terrain Tiles de Mapzen en AWS Open Data. Imagen: NASA Blue Marble.",
+        "credits": "Ríos © colaboradores de OpenStreetMap (ODbL). Frontera: Natural Earth. Relieve: Terrain Tiles de Mapzen en AWS Open Data. Imagen: EOxCloudless https://cloudless.eox.at de EOX IT Services GmbH (contiene datos Copernicus Sentinel modificados 2016), CC BY 4.0; color y sombreado modificados.",
     }
     with open(os.path.join(OUT, "rios.json"), "w", encoding="utf-8") as file:
         json.dump(data, file, ensure_ascii=False, separators=(",", ":"))
@@ -158,5 +162,4 @@ def build_rivers():
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     print("relieve (m):", build_relief())
-    build_satellite()
     print("tramos de río:", build_rivers())
