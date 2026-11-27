@@ -657,3 +657,16 @@ h1,h2,h3,.brand span,.footer-inner strong,.measurement,.study-value,.river-tag,.
 /* Ficha que Quri está explicando: se eleva y brilla en celeste */
 .study-label.quri-focus{border-color:#8fdcff;box-shadow:0 0 0 2px #8fdcff66,0 18px 44px #000a,0 0 34px #8fdcff40;transform:translateY(-4px)}
 .study-label.quri-focus:after{content:"Quri explica";position:absolute;top:-10px;right:14px;padding:2px 8px;border-radius:999px;background:#8fdcff;color:#0b211a;font:700 9.5px/1.4 var(--body);letter-spacing:.04em}
+
+/* Botón para terminar sobre la cabeza de Quri; en celular reemplaza al globo de texto */
+.quri-close{position:absolute;z-index:1;top:-20px;right:calc(var(--qw) * .24 - 17px);width:34px;height:34px;padding:0;border:2px solid #fff6dd;border-radius:50%;background:#e5484d;color:#fff;font:700 14px/1 var(--body);pointer-events:auto;box-shadow:0 6px 16px #0008;animation:quri-close-in .35s cubic-bezier(.34,1.56,.64,1) both}
+.spot-left .quri-close{right:auto;left:calc(var(--qw) * .24 - 17px)}
+.quri-close:hover{background:#c93a3f}
+.quri-dock[data-status=speaking] .quri-close{box-shadow:0 6px 16px #0008,0 0 0 4px #6ee7a066}
+.quri-dock[data-status=listening] .quri-close{box-shadow:0 6px 16px #0008,0 0 0 4px #8fdcff66}
+@keyframes quri-close-in{from{opacity:0;transform:scale(.4)}}
+@media(max-width:760px){
+  /* En celular la conversación es solo voz: el texto queda para lectores de pantalla y no tapa el mapa */
+  .quri-dock:is([data-status=connecting],[data-status=listening],[data-status=speaking]) .quri-bubble{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;animation:none}
+}
+@media(prefers-reduced-motion:reduce){.quri-close{animation:none}}

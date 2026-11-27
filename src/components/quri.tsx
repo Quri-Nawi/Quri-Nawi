@@ -286,6 +286,7 @@ export function Quri() {
         <canvas ref={canvasRef} aria-hidden="true" />
         <span className="quri-ring" aria-hidden="true" />
       </button>
+      {active && <button type="button" className="quri-close" onClick={() => stop()} aria-label="Terminar la conversación con Quri">✕</button>}
       {(active || hint || status === "error") && (
         <div className="quri-bubble" role="status" aria-live="polite">
           <p className="quri-state"><i aria-hidden="true" />{hint && !active ? "Quri · guía del mapa" : label}</p>
