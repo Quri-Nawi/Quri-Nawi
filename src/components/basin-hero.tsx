@@ -45,9 +45,10 @@ function Goals() {
 const anchors = records.flatMap((record) => record.places.map((place) => ({ id: record.id, lon: place.lon, lat: place.lat })));
 const highlighted = new Set<string>(areas);
 
-function StudyLabel({ record, setRef }: { record: Study; setRef: (node: HTMLElement | null) => void }) {
+function StudyLabel({ record, index, setRef }: { record: Study; index: number; setRef: (node: HTMLElement | null) => void }) {
   return (
     <article className="study-label" ref={setRef}>
+      <p className="study-meta" aria-hidden="true"><span>{record.matrix} / {record.area}</span><span>{String(index).padStart(2, "0")}</span></p>
       <p className="study-top"><span className={"matrix-chip matrix-" + record.matrix.split(" ")[0].toLowerCase()}>{record.matrix}</span><span className={"verif verif-" + record.verification}>{verificationLabel[record.verification]}</span></p>
       <h3>{record.title}</h3>
       {record.observation && <p className="study-value">{record.observation.value}<small>{record.observation.unit}</small><span>{record.observation.season}</span></p>}
@@ -327,7 +328,7 @@ export function BasinHero() {
           {[0, 1].map((side) => (
             <div key={side} className={"study-column " + (side ? "right" : "left")}>
               {studies.filter((_, index) => index % 2 === side).map((record) => (
-                <StudyLabel key={record.id} record={record} setRef={(node) => { if (node) labelRefs.current.set(record.id, node); else labelRefs.current.delete(record.id); }} />
+                <StudyLabel key={record.id} record={record} index={studies.indexOf(record) + 1} setRef={(node) => { if (node) labelRefs.current.set(record.id, node); else labelRefs.current.delete(record.id); }} />
               ))}
             </div>
           ))}

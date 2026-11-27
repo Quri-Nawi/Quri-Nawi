@@ -433,3 +433,13 @@ h1,h2,h3,.brand span,.footer-inner strong,.measurement,.study-value,.river-tag,.
 @keyframes dot-pop{from{transform:scale(0) rotate(-45deg)}}
 .alert-card .dots{grid-column:1/-1}
 @media(prefers-reduced-motion:reduce){.spark polyline{animation:none;stroke-dashoffset:0}.dots i{animation:none}}
+
+/* Fichas del río con estilo de panel técnico: leyenda monoespaciada, índice y entrada suave */
+.study-label{position:relative;border-radius:16px;background:linear-gradient(160deg,#10291fef,#0a1d17f2);border-color:#ffd36b40;transition:transform .3s,box-shadow .3s,border-color .3s}
+.study-label:hover{transform:translateY(-3px);border-color:#ffd36b99;box-shadow:0 20px 46px #000a,0 0 0 1px #ffd36b22}
+.study-meta{display:flex;justify-content:space-between;gap:8px;margin:-2px 0 8px;padding-bottom:7px;border-bottom:1px dashed #ffffff1f;font:600 9.5px/1.2 ui-monospace,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase;color:#9fb5a7}
+.study-meta span:last-child{color:#ffd36b}
+.study-label .study-value{animation:value-rise .6s .15s both}
+@keyframes value-rise{from{opacity:0;transform:translateY(8px)}}
+.study-dates dt{font-family:ui-monospace,Consolas,monospace}
+@media(prefers-reduced-motion:reduce){.study-label,.study-label .study-value{transition:none;animation:none}}
