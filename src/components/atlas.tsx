@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { areas, matrices, verificationLabel, type Area, type Verification } from "../lib/catalog";
 import type { CatalogSnapshot } from "../lib/public-catalog";
 import { Comparison } from "./comparison";
+import { RecordAuthorship } from "./record-authorship";
 import { Terrain } from "./terrain";
 
 const levels = Object.keys(verificationLabel) as Verification[];
@@ -54,6 +55,30 @@ export function Atlas({ snapshot, state, onRetry }: { snapshot: CatalogSnapshot;
     setSearch("");
   }
 
+  function showRelated(id: string) {
+    const related = records.find((item) => item.id === id);
+    if (!related) return;
+    setArea(related.area);
+    setMatrix("");
+    setVerification("");
+    setSearch("");
+    window.setTimeout(() => {
+      const card = document.getElementById("ficha-" + id);
+      const detail = card?.querySelector("details");
+      if (detail) detail.open = true;
+      const list = card?.closest<HTMLElement>(".record-list");
+      if (list && card) {
+        list.scrollIntoView({ block: "center" });
+        list.scrollTop += card.getBoundingClientRect().top - list.getBoundingClientRect().top;
+      }
+    }, 0);
+  }
+
+  function showRiver(river: Area) {
+    window.dispatchEvent(new CustomEvent("quri:river", { detail: river }));
+    document.getElementById("inicio")?.scrollIntoView({ block: "start" });
+  }
+
   return (
     <>
       <section className="section-inner explorer anchor-section" id="explorar" aria-labelledby="atlas-title">
@@ -88,7 +113,7 @@ export function Atlas({ snapshot, state, onRetry }: { snapshot: CatalogSnapshot;
             </div>
             {matching.length === 0 ? <div className="empty"><p>Sin registros en este catálogo para esos filtros.</p><button type="button" className="text-button" onClick={reset}>Limpiar filtros</button></div>
               : <div className="record-list">
-                {matching.map((record) => <article className="record" key={record.id}>
+                {matching.map((record) => <article className="record" id={"ficha-" + record.id} key={record.id}>
                   <div className="record-main">
                     <p className="record-meta">{record.id} <span>·</span> {record.area} <span>·</span> {record.matrix} <span>·</span> Publicación {record.published}</p>
                     <h3>{record.title}</h3>
@@ -104,6 +129,7 @@ export function Atlas({ snapshot, state, onRetry }: { snapshot: CatalogSnapshot;
                       <ul>{record.limits.map((limit) => <li key={limit}>{limit}</li>)}</ul>
                       <p className="record-sources">Fuentes: {record.sourceIds.map((id) => sourceLinks[id] ? <a key={id} href={sourceLinks[id].url} target="_blank" rel="noreferrer" title={sourceLinks[id].title}>{id} ↗</a> : <span key={id}>{id}</span>)}</p>
                       <a href={record.url} target="_blank" rel="noreferrer">{record.source} ↗</a>
+                      <RecordAuthorship record={record} records={records} sourceLinks={sourceLinks} onRelated={showRelated} onRiver={showRiver} />
                     </details>
                   </div>
                   <button className="select-record" type="button" aria-label={"Comparar " + record.title} aria-pressed={chosen.includes(record.id)} onClick={() => select(record.id)}>{chosen.includes(record.id) ? "✓" : "+"}</button>

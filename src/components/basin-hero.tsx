@@ -131,6 +131,15 @@ export function BasinHero({ records }: { records: readonly CatalogRecord[] }) {
   }, [records]);
 
   useEffect(() => {
+    const openRiver = (event: Event) => {
+      const river = (event as CustomEvent<unknown>).detail;
+      if (areas.includes(river as typeof areas[number])) setSelected(river as string);
+    };
+    window.addEventListener("quri:river", openRiver);
+    return () => window.removeEventListener("quri:river", openRiver);
+  }, []);
+
+  useEffect(() => {
     selectedRef.current = selected;
     sceneRef.current?.focus(selected);
     const url = new URL(window.location.href);
