@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { areas, matrices, records, verificationLabel, type Area, type Verification } from "../lib/catalog";
+import { areas, matrices, verificationLabel, type Area, type Verification } from "../lib/catalog";
+import type { CatalogSnapshot } from "../lib/public-catalog";
 import { Comparison } from "./comparison";
 import { Terrain } from "./terrain";
-
-export type SourceLinks = { readonly [id: string]: { readonly title: string; readonly url: string } };
 
 const levels = Object.keys(verificationLabel) as Verification[];
 
@@ -13,7 +12,8 @@ function normalize(value: string) {
   return value.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
 }
 
-export function Atlas({ sourceLinks }: { sourceLinks: SourceLinks }) {
+export function Atlas({ snapshot, state, onRetry }: { snapshot: CatalogSnapshot; state: "loading" | "ready" | "empty" | "error"; onRetry: () => void }) {
+  const { records, sourceLinks } = snapshot;
   const [area, setArea] = useState<Area | "">("");
   const [matrix, setMatrix] = useState("");
   const [verification, setVerification] = useState<Verification | "">("");
@@ -61,6 +61,15 @@ export function Atlas({ sourceLinks }: { sourceLinks: SourceLinks }) {
           <div><p className="eyebrow">Explorar evidencia</p><h2 id="atlas-title">La cuenca del Beni</h2></div>
           <p>Selecciona un río o filtra el catálogo para encontrar el estudio, ver qué se comprobó y abrir su referencia.</p>
         </div>
+        <p className="catalog-provenance" role="status">
+          {state === "loading" && "Consultando el catálogo y las fuentes… "}
+          {state === "error" && <>No se pudo actualizar la consulta. Se muestran las fichas incluidas en esta versión. <button className="text-button" type="button" onClick={onRetry}>Reintentar</button> </>}
+          {state === "empty" && "La consulta no devolvió fichas. "}
+          {snapshot.copy === "offline" ? "Copia sin conexión" : snapshot.copy === "online" ? "Consulta de la web revisada" : "Copia incluida en la app"}
+          {" · versión " + snapshot.version + " · revisión documental " + snapshot.checked}
+          {snapshot.consultedAt && " · copia obtenida " + new Date(snapshot.consultedAt).toLocaleString("es-BO")}
+          {" · semillas pendientes de autorización en GoldEye Trace."}
+        </p>
         <div className="atlas-grid">
           <div className="atlas-map">
             <Terrain selected={area} onSelect={(place) => setArea(area === place ? "" : place)} />
@@ -81,13 +90,14 @@ export function Atlas({ sourceLinks }: { sourceLinks: SourceLinks }) {
               : <div className="record-list">
                 {matching.map((record) => <article className="record" key={record.id}>
                   <div className="record-main">
-                    <p className="record-meta">{record.area} <span>·</span> {record.matrix} <span>·</span> Publicación {record.published}</p>
+                    <p className="record-meta">{record.id} <span>·</span> {record.area} <span>·</span> {record.matrix} <span>·</span> Publicación {record.published}</p>
                     <h3>{record.title}</h3>
                     <p className="record-status"><span className={"verif verif-" + record.verification}>{verificationLabel[record.verification]}</span><span className="evidence-type">{record.evidenceType}</span></p>
                     <details>
                       <summary>Ver ficha</summary>
                       <p>{record.note}</p>
                       <p>Muestreo: {record.sample} · Comprobada el {record.checked}</p>
+                      <p>Versión {record.version} · Estado: pendiente de autorización en GoldEye Trace.</p>
                       <h4>Qué se comprobó</h4>
                       <ul>{record.claims.map((claim) => <li key={claim}>{claim}</li>)}</ul>
                       <h4>Límites</h4>

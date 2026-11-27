@@ -1,4 +1,5 @@
 export type Area = "Beni" | "Kaka" | "Madre de Dios";
+export const catalogVersion = "2026-11-26.1";
 export type Matrix = "Sedimentos" | "Peces" | "Datos agregados" | "Proyecto";
 
 /**

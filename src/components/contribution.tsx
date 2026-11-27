@@ -69,7 +69,7 @@ export function Contribution() {
       <div>
         <p className="eyebrow">Ampliar el catálogo</p>
         <h2 id="contribution-title">Aporta un estudio.</h2>
-        <p>Guarda la referencia que quieres proponer. Esta primera versión conserva el borrador en tu navegador. Una ficha requiere revisión y autorización antes de publicarse.</p>
+        <p>Guarda la referencia que quieres proponer. El borrador queda en este navegador: la web todavía no lo envía a la cola de GoldEye Trace ni asigna un ID de propuesta. Una ficha requiere revisión y autorización antes de publicarse.</p>
       </div>
       <div className="contribution-panel">
         <form onSubmit={submit}>
