@@ -615,3 +615,41 @@ h1,h2,h3,.brand span,.footer-inner strong,.measurement,.study-value,.river-tag,.
   .alert-card{grid-template-columns:auto auto;justify-content:start;column-gap:16px}
   .spark{width:54px;height:20px}
 }
+
+/* Quri: se asoma por el borde de la pantalla, como apoyado en el marco de una ventana */
+.quri-dock{--qw:clamp(132px,10vw,176px);position:fixed;z-index:15;top:46%;display:flex;align-items:center;gap:10px;pointer-events:none;transition:top .8s cubic-bezier(.2,.9,.25,1)}
+.quri-dock.spot-right{right:0;flex-direction:row-reverse}
+.quri-dock.spot-left{left:0;top:40%}
+.quri-body{position:relative;flex:none;width:var(--qw);aspect-ratio:600/650;padding:0;border:0;background:none;cursor:pointer;pointer-events:auto;transition:transform .85s cubic-bezier(.34,1.56,.64,1);filter:drop-shadow(0 14px 22px #0009)}
+.quri-body canvas{display:block;width:100%;height:100%}
+.spot-right .quri-body{transform:translateX(50%) rotate(-15deg);animation:quri-peek-r 9s 3s ease-in-out infinite}
+.spot-left .quri-body{transform:scaleX(-1) translateX(50%) rotate(-15deg);animation:quri-peek-l 9s 3s ease-in-out infinite}
+.spot-right.is-out .quri-body{transform:translateX(26%) rotate(-9deg);animation:none}
+.spot-left.is-out .quri-body{transform:scaleX(-1) translateX(26%) rotate(-9deg);animation:none}
+@keyframes quri-peek-r{0%,62%,100%{transform:translateX(50%) rotate(-15deg)}72%,90%{transform:translateX(30%) rotate(-10deg)}}
+@keyframes quri-peek-l{0%,62%,100%{transform:scaleX(-1) translateX(50%) rotate(-15deg)}72%,90%{transform:scaleX(-1) translateX(30%) rotate(-10deg)}}
+.quri-body:hover{filter:drop-shadow(0 14px 22px #0009) brightness(1.04)}
+.quri-body:focus-visible{outline:3px solid #ffd36b;outline-offset:-10px;border-radius:40%}
+.quri-ring{position:absolute;left:18%;top:2%;width:64%;aspect-ratio:1;border-radius:50%;border:3px solid #8fdcff;opacity:0;pointer-events:none}
+.quri-dock[data-status=listening] .quri-ring{animation:quri-listen 1.6s ease-out infinite}
+.quri-dock[data-status=connecting] .quri-ring{border-color:#ffd36b;animation:quri-listen 1s ease-out infinite}
+@keyframes quri-listen{from{opacity:.8;transform:scale(.85)}to{opacity:0;transform:scale(1.25)}}
+.quri-bubble{position:relative;width:min(300px,calc(100vw - var(--qw) * .6 - 24px));padding:11px 13px 12px;border-radius:16px;background:#0b211af2;border:1px solid #ffd36b66;color:#e8efe6;box-shadow:0 16px 40px #000a;pointer-events:auto;transform-origin:right center;animation:quri-bubble .45s cubic-bezier(.34,1.56,.64,1) both}
+.spot-left .quri-bubble{transform-origin:left center}
+@keyframes quri-bubble{from{opacity:0;transform:scale(.7) translateY(8px)}}
+.quri-state{display:flex;align-items:center;gap:7px;margin:0 0 5px;font:600 10px/1.2 ui-monospace,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase;color:#ffd36b}
+.quri-state i{width:7px;height:7px;border-radius:50%;background:#ffd36b}
+.quri-dock[data-status=listening] .quri-state i{background:#8fdcff;animation:quri-dot 1s infinite alternate}
+.quri-dock[data-status=speaking] .quri-state i{background:#6ee7a0;animation:quri-dot .35s infinite alternate}
+@keyframes quri-dot{to{opacity:.25}}
+.quri-user{margin:0 0 6px;padding:5px 9px;border-radius:10px 10px 3px 10px;background:#fff8e6;color:#1b2b1f;font-size:12px;justify-self:end;max-width:90%;margin-left:auto;width:max-content}
+.quri-text{margin:0;font-size:13.5px;line-height:1.45;max-height:9.5em;overflow:auto}
+.quri-stop{margin-top:8px;padding:5px 11px;border:1px solid #ffffff40;border-radius:999px;background:transparent;color:#fff6dd;font-size:11.5px;font-weight:700}
+.quri-stop:hover{background:#ffffff1a}
+@media(max-width:760px){
+  .quri-dock{--qw:104px;top:34%}
+  .quri-dock.spot-left{top:30%}
+  .quri-bubble{width:min(240px,64vw);padding:9px 11px}
+  .quri-text{font-size:12.5px;max-height:7.5em}
+}
+@media(prefers-reduced-motion:reduce){.quri-body,.quri-dock{transition:none;animation:none!important}.quri-bubble,.quri-ring{animation:none!important}}
