@@ -31,6 +31,8 @@ export type BasinScene = {
   zoom: (factor: number) => void;
   setRotation: (on: boolean) => void;
   setTexture: (texture: THREE.Texture) => void;
+  /** Escenario «si nadie vuelve a medir»: color por río, alertas pulsantes y tono del terreno; null vuelve al mapa normal. */
+  setOutlook: (outlook: { colors: ReadonlyMap<string, number>; alerts: ReadonlySet<string>; tint: number } | null) => void;
   dispose: () => void;
 };
 
@@ -211,6 +213,18 @@ export function createBasinScene(options: SceneOptions): BasinScene {
       points.forEach((point) => entry.box.expandByPoint(point));
     }
     rivers.set(river.name, entry);
+  }
+
+  // Anillos de alerta del escenario, ocultos en el mapa normal.
+  const alerts = new Map<string, THREE.Mesh>();
+  for (const river of rivers.values()) {
+    const longest = river.curves.reduce((a, b) => (b.points.length > a.points.length ? b : a));
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.05, 0.065, 48), new THREE.MeshBasicMaterial({ color: 0xff3b30, transparent: true, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending }));
+    ring.rotateX(-Math.PI / 2);
+    ring.position.copy(longest.getPointAt(0.55));
+    ring.visible = false;
+    scene.add(ring);
+    alerts.set(river.name, ring);
   }
 
   // Corriente de luz sobre los ríos que ya tienen fichas.
@@ -408,6 +422,12 @@ export function createBasinScene(options: SceneOptions): BasinScene {
       });
       flowPositions.needsUpdate = true;
       const time = performance.now() / 1000;
+      for (const ring of alerts.values()) {
+        if (!ring.visible) continue;
+        const phase = (time * 0.6) % 1;
+        ring.scale.setScalar(1 + phase * 3);
+        (ring.material as THREE.MeshBasicMaterial).opacity = focused ? 0 : 0.95 * (1 - phase); // al acercarse a un río, el panel ya muestra la antigüedad
+      }
       for (const pin of pins) {
         const phase = (time * 0.8 + pin.phase) % 1;
         pin.ring.scale.setScalar(1 + phase * 2.4);
@@ -450,6 +470,16 @@ export function createBasinScene(options: SceneOptions): BasinScene {
       groundMaterial.needsUpdate = true;
       texture.dispose();
       texture = next;
+    },
+    setOutlook(outlook) {
+      for (const river of rivers.values()) {
+        const color = outlook?.colors.get(river.name);
+        river.core.color.setHex(color ?? (river.featured ? 0xffd36b : 0x8fdcff));
+        river.glow.color.setHex(color ?? (river.featured ? 0xffb938 : 0x58c4ff));
+        alerts.get(river.name)!.visible = Boolean(outlook?.alerts.has(river.name));
+      }
+      groundMaterial.color.setHex(outlook?.tint ?? 0xffffff);
+      flow.visible = !outlook; // la corriente dorada significa «tiene fichas»; en el escenario manda el color por antigüedad
     },
     setRotation(on) {
       rotating = on && !options.reducedMotion;
