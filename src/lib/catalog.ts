@@ -34,6 +34,8 @@ export type Record = {
   sourceIds: readonly string[];
   precision: string;
   places: readonly { name: string; lon: number; lat: number }[];
+  /** Qué mide la ficha, si trae una medición de mercurio; la usa el escenario de antigüedad del dato. */
+  measures?: "ambiente" | "peces" | "personas";
 };
 
 export const verificationLabel: { readonly [K in Verification]: string } = {
@@ -64,6 +66,7 @@ export const matrices: readonly Matrix[] = ["Sedimentos", "Peces", "Datos agrega
 export const records: readonly Record[] = [
   {
     id: "kaka-seca",
+    measures: "ambiente",
     title: "Mercurio en sedimentos · época seca",
     area: "Kaka",
     matrix: "Sedimentos",
@@ -84,6 +87,7 @@ export const records: readonly Record[] = [
   },
   {
     id: "kaka-humeda",
+    measures: "ambiente",
     title: "Mercurio en sedimentos · época húmeda",
     area: "Kaka",
     matrix: "Sedimentos",
@@ -104,6 +108,7 @@ export const records: readonly Record[] = [
   },
   {
     id: "peces-levy",
+    measures: "peces",
     title: "Elementos traza en peces comestibles del Beni",
     area: "Beni",
     matrix: "Peces",
@@ -131,6 +136,7 @@ export const records: readonly Record[] = [
   },
   {
     id: "peces-rurrenabaque",
+    measures: "peces",
     title: "Composición nutricional y mercurio en peces del Beni",
     area: "Beni",
     matrix: "Peces",
@@ -158,6 +164,7 @@ export const records: readonly Record[] = [
   },
   {
     id: "cedib-beni",
+    measures: "personas",
     title: "Mercurio en cabello de mujeres de Rurrenabaque (río Beni)",
     area: "Beni",
     matrix: "Datos agregados",
@@ -182,6 +189,7 @@ export const records: readonly Record[] = [
   },
   {
     id: "cedib-madre-de-dios",
+    measures: "personas",
     title: "Mercurio en cabello de mujeres de Riberalta (Madre de Dios)",
     area: "Madre de Dios",
     matrix: "Datos agregados",
@@ -206,6 +214,7 @@ export const records: readonly Record[] = [
   },
   {
     id: "cpilap-2023",
+    measures: "personas",
     title: "Mercurio en cabello de 302 personas de 36 comunidades indígenas (CPILAP y UMSA)",
     area: "Beni",
     matrix: "Datos agregados",
