@@ -177,13 +177,18 @@ flowchart TB
     H["🩺 /api/health"]
 ```
 
+![Render de la maqueta de la cuenca en Blender](docs/assets/maqueta-blender.jpg)
+
+<sub>Render en Blender del relieve real (altura ×11). Imagen: <a href="https://cloudless.eox.at">EOxCloudless</a> de EOX IT Services GmbH (contiene datos Copernicus Sentinel modificados 2016), <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, con color y sombreado modificados. Ríos © colaboradores de OpenStreetMap.</sub>
+
 | Lugar | Responsabilidad |
 | --- | --- |
 | `src/app` | Portada, estilos, manifiesto PWA y rutas HTTP (`/api/catalogo`, `/api/fuentes`, `/api/health`). |
 | `src/components` | Maqueta 3D (Three.js), atlas 2D, relieve, comparación, aportes, guía Quri, instalación y secciones de método, impacto, agentes y escala. |
 | `src/lib` | Identidad del proyecto, catálogo y registro de fuentes y cifras. |
 | `public` | Logo, íconos, tipografías, *service worker* y datos de la cuenca en `public/geo`. |
-| `scripts/geodatos.py` | Regenera relieve, imagen satelital y ríos de `public/geo` desde fuentes públicas. |
+| `scripts/geodatos.py` | Regenera relieve y ríos de `public/geo` desde fuentes públicas. |
+| `scripts/terreno_hd.py`, `scripts/blender_terreno.py` | Descargan relieve y satélite en alta resolución, hornean oclusión y sombras en Blender y componen las texturas de la maqueta. |
 | `scripts/validar-datos.mjs` | Comprueba que fichas, fuentes y cifras sean coherentes entre sí y con los CSV. |
 | `scripts/smoke.mjs` | Prueba HTTP de la app en ejecución. |
 | `docs` | Respaldo de datos, viabilidad y capturas. |
@@ -282,7 +287,7 @@ Trabaja en una rama desde `main`, limita el cambio a una sección y abre una sol
 
 - 🎬 [Aplicación pública Quri-Ñawi](https://quri-nawi.vercel.app/), referencia visual y del servidor MCP.
 - 🏆 [Gold for Good Hackathon](https://gold4good.info.bo/site/). Su logo aparece en el pie de la app como crédito a la hackathon.
-- 🗺️ Ríos © colaboradores de [OpenStreetMap](https://www.openstreetmap.org/copyright) (ODbL). Relieve: [Terrain Tiles](https://registry.opendata.aws/terrain-tiles/) de Mapzen en AWS Open Data (SRTM, GMTED, ETOPO1). Imagen: NASA Blue Marble vía GIBS. Frontera: Natural Earth.
+- 🗺️ Ríos © colaboradores de [OpenStreetMap](https://www.openstreetmap.org/copyright) (ODbL). Relieve: [Terrain Tiles](https://registry.opendata.aws/terrain-tiles/) de Mapzen en AWS Open Data (SRTM, GMTED, ETOPO1). Imagen: Sentinel-2 cloudless 2016, [EOxCloudless](https://cloudless.eox.at) de EOX IT Services GmbH (contiene datos Copernicus Sentinel modificados 2016), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); color y sombreado modificados, tono igualado a NASA Blue Marble. Frontera: Natural Earth.
 - 🎨 El logo de Quri-Ñawi se generó con ImageGen. Los detalles están en [docs/architecture.md](docs/architecture.md#créditos-de-imagen).
 - 🔤 Tipografías Inter y Space Grotesk, con licencia SIL Open Font License 1.1.
 

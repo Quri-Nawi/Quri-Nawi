@@ -19,7 +19,7 @@ La primera versión usa el App Router de Next.js con TypeScript y npm. La portad
 | `public/sw.js` | Caché de la vista principal y de sus recursos públicos. |
 | `scripts/validar-datos.mjs` | `npm run datos`: coherencia entre fichas, fuentes, cifras y CSV. Se ejecuta antes del lint en `npm run check`. |
 | `scripts/smoke.mjs` | Prueba HTTP de la portada, el respaldo, el estado, el catálogo, las fuentes, el manifiesto y el *service worker*. |
-| `public/geo` | `relieve.bin` (elevación en metros, Uint16), `satelite.jpg` y `rios.json`, generados por `scripts/geodatos.py`. |
+| `public/geo` | `relieve.bin` (elevación en metros, Uint16) y `rios.json`, generados por `scripts/geodatos.py`; `satelite.jpg`, `satelite-hd.jpg` (solo escritorio) y `normales.jpg`, generados por `scripts/terreno_hd.py` y `scripts/blender_terreno.py`. |
 | `docs/fuentes` | Respaldo de datos: registro de fuentes, matriz de cifras, conflictos, redacción de cifras y límites. |
 | `docs/viabilidad.md` | Evaluación de viabilidad: qué está demostrado y qué no. |
 | `docs/assets` | Capturas de la aplicación usadas en el README. |
@@ -42,6 +42,7 @@ La primera versión usa el App Router de Next.js con TypeScript y npm. La portad
 
 - Ríos © colaboradores de OpenStreetMap, con licencia ODbL; `rios.json` es una extracción simplificada y queda bajo esa misma licencia.
 - Relieve: Terrain Tiles de Mapzen en AWS Open Data (SRTM, GMTED, ETOPO1). La maqueta exagera la altura ×11 para que el relieve se lea.
-- Imagen: NASA Blue Marble Next Generation vía GIBS. Frontera: Natural Earth. Ambas de dominio público.
+- Imagen: Sentinel-2 cloudless 2016, [EOxCloudless](https://cloudless.eox.at) de EOX IT Services GmbH (contiene datos Copernicus Sentinel modificados 2016), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Se ajustó el color, se igualó el tono con NASA Blue Marble y se hornearon en Blender la oclusión y las sombras del relieve real. Las versiones posteriores de ese mosaico tienen licencia no comercial.
+- Frontera: Natural Earth (dominio público).
 - Los marcadores usan la ubicación aproximada de cada ficha y muestran su precisión. Un mercado de compra no se presenta como sitio de captura.
 - Sin WebGL, o con movimiento reducido, la portada sigue siendo usable: el giro se detiene y la vista 2D y la lista responden la misma pregunta.
