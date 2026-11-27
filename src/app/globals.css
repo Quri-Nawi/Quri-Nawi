@@ -402,3 +402,6 @@ h1,h2,h3,.brand span,.footer-inner strong,.measurement,.study-value,.river-tag,.
 .outlook-years button:hover{transform:translateY(-1px)}
 .outlook-years button[aria-pressed=true]{transform:scale(1.06)}
 @media(prefers-reduced-motion:reduce){.outlook-fill,.outlook-years button{transition:none}}
+
+.basin-intro.is-outlook .outlook-note{margin:0;font:600 10px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase;color:#d9b9ad}
+.basin-intro.is-outlook .priority-list{margin-top:12px}

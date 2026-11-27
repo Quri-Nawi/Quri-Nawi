@@ -264,7 +264,7 @@ export function BasinHero() {
         </> : <>
           <p className="eyebrow">{year === 2026 ? "Hoy" : "Escenario " + year} · si nadie vuelve a medir</p>
           <h1 id="hero-title">{year === 2026 ? "Hoy, el último dato del Kaka tiene" : "En " + year + ", el último dato del Kaka tendría"} <em>{outlooks.get("Kaka")?.age} años.</em></h1>
-          <p>El color de cada río muestra la antigüedad de su medición de mercurio más reciente en este catálogo. No proyecta contaminación: muestra dónde la evidencia envejece y qué conviene medir primero.</p>
+          <p className="outlook-note">Antigüedad del dato más reciente · no proyecta contaminación</p>
           <ol className="priority-list" aria-label="Dónde medir primero">
             {[...areas].sort((a, b) => (outlooks.get(b)?.age ?? 999) - (outlooks.get(a)?.age ?? 999)).map((river) => {
               const outlook = outlooks.get(river);
