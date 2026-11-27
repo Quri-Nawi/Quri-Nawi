@@ -187,6 +187,18 @@ export function BasinHero() {
     };
   }, []);
 
+  // Quri mueve el mapa por voz: elegir un río, cambiar de año o volver a la vista general.
+  useEffect(() => {
+    const onControl = (event: Event) => {
+      const detail = (event as CustomEvent<{ action: string; river?: string; year?: number | null }>).detail;
+      if (detail.action === "river" && detail.river) setSelected(detail.river);
+      else if (detail.action === "home") setSelected(null);
+      else if (detail.action === "year") setYear(outlookYears.find((option) => option === detail.year) ?? null);
+    };
+    window.addEventListener("quri:control", onControl);
+    return () => window.removeEventListener("quri:control", onControl);
+  }, []);
+
   useEffect(() => {
     selectedRef.current = selected;
     sceneRef.current?.focus(selected);
