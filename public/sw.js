@@ -1,5 +1,5 @@
 /* global self, caches, fetch, URL, Response */
-const CACHE = "quri-nawi-public-v7";
+const CACHE = "quri-nawi-public-v8";
 const shellFiles = [
   "/manifest.webmanifest",
   "/brand/quri-nawi.png",
@@ -12,6 +12,7 @@ const shellFiles = [
   "/geo/normales.jpg",
   "/fonts/inter.woff2",
   "/fonts/space-grotesk.woff2",
+  "/fonts/bargain.woff",
 ];
 // Se guardan solo si se usan: la textura de escritorio no se descarga por adelantado.
 const onDemandFiles = ["/geo/satelite-hd.jpg", "/pdf.worker.min.mjs"];
