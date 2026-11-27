@@ -23,6 +23,20 @@ export const levelLabel: { readonly [K in Level]: string } = {
   "sin-datos": "Sin datos en el catálogo",
 };
 
+// Color continuo por antigüedad: verde (0 años) → ámbar (5) → naranja (10) → rojo (20 o más); gris si no hay datos.
+const stops: readonly [number, number][] = [[0, 0x6ee7a0], [5, 0xffd36b], [10, 0xff8a3d], [20, 0xff3b30]];
+export function ageColor(age: number | null) {
+  if (age === null) return 0x9a93b5;
+  const i = stops.findIndex(([at]) => at >= age);
+  if (i === -1) return stops[stops.length - 1][1];
+  if (i === 0) return stops[0][1];
+  const [a, ca] = stops[i - 1], [b, cb] = stops[i];
+  const t = (age - a) / (b - a);
+  const mix = (shift: number) => Math.round(((ca >> shift) & 255) * (1 - t) + ((cb >> shift) & 255) * t) << shift;
+  return mix(16) | mix(8) | mix(0);
+}
+export const cssColor = (color: number) => "#" + color.toString(16).padStart(6, "0");
+
 export function sampleYear(sample: string) {
   const years = sample.match(/\b(19|20)\d{2}\b/g);
   return years ? Math.max(...years.map(Number)) : null;

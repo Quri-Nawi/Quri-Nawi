@@ -3,7 +3,7 @@
 import { readFileSync } from "node:fs";
 import { records } from "../src/lib/catalog.ts";
 import { checkedOn, figureStatusLabel, figures, sources, summarize } from "../src/lib/evidence.ts";
-import { riverOutlook, sampleYear } from "../src/lib/outlook.ts";
+import { ageColor, riverOutlook, sampleYear } from "../src/lib/outlook.ts";
 
 const fallos = [];
 const comprobar = (condicion, mensaje) => { if (!condicion) fallos.push(mensaje); };
@@ -92,6 +92,7 @@ comprobar(sampleYear("Jul–ago 2015") === 2015 && sampleYear("Estudios de 1997 
 const kaka2050 = riverOutlook(records, "Kaka", 2050);
 comprobar(kaka2050.newest === 1998 && kaka2050.age === 52 && kaka2050.level === "critico", "El escenario del Kaka en 2050 debería dar 52 años y nivel crítico.");
 comprobar(riverOutlook(records, "Mamoré", 2026).level === "sin-datos", "Un río sin fichas debería quedar sin datos.");
+comprobar(ageColor(0) === 0x6ee7a0 && ageColor(25) === 0xff3b30 && ageColor(null) === 0x9a93b5 && ageColor(3) !== ageColor(4), "ageColor no recorre la escala verde, ámbar, naranja y rojo.");
 comprobar(riverOutlook(records, "Kaka", 2030).age === 32 && riverOutlook(records, "Beni", 2027).age === 3, "Antigüedad del Kaka en 2030 o del Beni en 2027 inesperada.");
 comprobar(records.filter((r) => r.measures).every((r) => r.matrix !== "Proyecto"), "Una ficha de proyecto no puede contar como medición.");
 

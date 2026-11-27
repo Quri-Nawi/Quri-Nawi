@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { areas, records, verificationLabel, type Record as Study } from "../lib/catalog";
 import type { BasinScene, Geo } from "./basin-scene";
 import { placeLabels, type Tag } from "./label-layout";
-import { levelLabel, outlookYears, riverOutlook, type Level, type OutlookYear } from "../lib/outlook";
+import { ageColor, cssColor, levelLabel, outlookYears, riverOutlook, type Level, type OutlookYear } from "../lib/outlook";
 
 const checked = ["agua", "sedimentos", "peces"];
 // Lo que las etiquetas del mapa no deben tapar.
@@ -20,7 +20,6 @@ function gapText(river: string) {
   return `En este catálogo todavía no hay fichas ${list} para este río.`;
 }
 
-const levelColor: { readonly [K in Level]: number } = { reciente: 0x6ee7a0, envejece: 0xffd36b, antiguo: 0xff8a3d, critico: 0xff3b30, "sin-datos": 0x9a93b5 };
 // Cada año tiñe un poco más el terreno: el mismo río se lee distinto en 2027 y en 2030.
 const yearTint: { readonly [K in OutlookYear]: number } = { 2026: 0xffffff, 2027: 0xf7e9e2, 2028: 0xefd6cb, 2029: 0xe6c0b2, 2030: 0xdba597 };
 // Colores oficiales de los ODS de la ONU; Minamata es el convenio sobre mercurio del que Bolivia es parte.
@@ -90,7 +89,7 @@ export function BasinHero() {
   useEffect(() => {
     if (status !== "ready") return;
     sceneRef.current?.setOutlook(year === null ? null : {
-      colors: new Map([...outlooks].map(([name, outlook]) => [name, levelColor[outlook.level]])),
+      colors: new Map([...outlooks].map(([name, outlook]) => [name, ageColor(outlook.age)])),
       alerts: new Set([...outlooks].filter(([, outlook]) => outlook.level === "critico").map(([name]) => name)),
       tint: yearTint[year],
     });
@@ -235,7 +234,7 @@ export function BasinHero() {
       {status === "ready" && <div className="basin-tags" aria-hidden="true">
         {places.map((place) => <span key={place.name} className="place-tag" ref={tag("place", place.name, place.lon, place.lat)}>{place.name}</span>)}
         {riverTags.filter((river) => !selected || river.name === selected).map((river) => (
-          <span key={river.name} className={"river-tag" + (year !== null ? " level-" + outlooks.get(river.name)?.level : "") + (highlighted.has(river.name) ? " has-studies" : "") + (selected === river.name ? " is-selected" : "")} ref={tag("river", river.name, river.lon, river.lat)}>
+          <span key={river.name} style={year !== null ? { ["--lv" as string]: cssColor(ageColor(outlooks.get(river.name)?.age ?? null)) } : undefined} className={"river-tag" + (year !== null ? " level-" + outlooks.get(river.name)?.level : "") + (highlighted.has(river.name) ? " has-studies" : "") + (selected === river.name ? " is-selected" : "")} ref={tag("river", river.name, river.lon, river.lat)}>
             Río {river.name}{year === null && highlighted.has(river.name) ? <b>{studiesOf(river.name).length}</b> : null}
             {year !== null && <em className="age">{outlooks.get(river.name)?.newest ? outlooks.get(river.name)?.newest + " · " + outlooks.get(river.name)?.age + " años" : "sin datos"}</em>}
           </span>
