@@ -1,14 +1,19 @@
 const method = [
-  ["Recopilar", "Guardar la fuente y distinguir el momento de muestreo del año de publicación."],
-  ["Revisar", "Cotejar método, matriz, lugar y unidad. Un dato con información incompleta conserva ese estado."],
-  ["Publicar", "Compartir registros autorizados y conservar la referencia que permite comprobar cada dato."],
+  { title: "Recopilar", meta: "Fuente / enlace", text: "Guardar la fuente y distinguir el momento de muestreo del año de publicación.", visual: <span className="viz-stagger" aria-hidden="true">{[0, 1, 2, 3, 4].map((i) => <i key={i} style={{ ["--d" as string]: i }} />)}</span> },
+  { title: "Revisar", meta: "Método / matriz / unidad", text: "Cotejar método, matriz, lugar y unidad. Un dato con información incompleta conserva ese estado.", visual: <svg className="viz-wave" viewBox="0 0 160 60" aria-hidden="true"><line x1="0" y1="30" x2="160" y2="30" /><line x1="40" y1="4" x2="40" y2="56" /><circle cx="40" cy="30" r="14" /><path d="M0 30 C 20 4, 40 4, 60 30 S 100 56, 120 30 S 150 8, 160 18" /><circle className="viz-runner" r="3.5" /></svg> },
+  { title: "Publicar", meta: "Borrador / revisión / pública", text: "Compartir registros autorizados y conservar la referencia que permite comprobar cada dato.", visual: <span className="viz-sequence" aria-hidden="true"><b>Borrador</b><b>Revisión</b><b>Pública</b></span> },
 ];
 
 export function ProjectSections() {
   return <>
     <section className="section-inner method anchor-section" id="metodo" aria-labelledby="method-title">
       <div className="section-head"><div><p className="eyebrow">Método</p><h2 id="method-title">Cada dato tiene un origen.</h2></div><p>El catálogo conserva las referencias y los límites de cada observación para que puedas volver al documento.</p></div>
-      <ol className="method-list">{method.map(([title, description]) => <li key={title}><h3>{title}</h3><p>{description}</p></li>)}</ol>
+      <ol className="toolkit-grid">{method.map((step, index) => <li key={step.title} className="tool-card">
+        <p className="tool-meta"><span>{step.meta}</span><span>{String(index + 1).padStart(2, "0")}</span></p>
+        <h3>{step.title}</h3>
+        <div className="tool-visual">{step.visual}</div>
+        <p>{step.text}</p>
+      </li>)}</ol>
     </section>
     <div className="insight">
       <div className="section-inner insight-inner">
