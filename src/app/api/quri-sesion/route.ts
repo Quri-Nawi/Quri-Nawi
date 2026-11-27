@@ -38,9 +38,15 @@ export async function POST(request: Request) {
         model: MODEL,
         instructions: quriInstructions(),
         output_modalities: ["audio"],
-        max_output_tokens: 350,
+        // La voz gasta ~1 token cada 50 ms: 1600 tokens dan ~80 s, suficiente para terminar una explicación.
+        max_output_tokens: 1600,
         audio: {
-          input: { transcription: { model: "gpt-4o-mini-transcribe", language: "es" }, turn_detection: { type: "semantic_vad" } },
+          input: {
+            transcription: { model: "gpt-4o-mini-transcribe", language: "es" },
+            // Voz cercana y clara: reducción de ruido de campo cercano y umbral alto para que ruidos cortos no corten a Quri.
+            noise_reduction: { type: "near_field" },
+            turn_detection: { type: "server_vad", threshold: 0.8, prefix_padding_ms: 300, silence_duration_ms: 800, interrupt_response: true, create_response: true },
+          },
           output: { voice: "marin" },
         },
         tools: quriTools,
